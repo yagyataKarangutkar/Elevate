@@ -7,7 +7,7 @@ interface SwarmCanvasProps {
   agents?: Agent[];
   onSelectAgent?: (id: string) => void;
   interactive?: boolean;
-  mode?: 'hero' | 'inspector' | 'roverOnly';
+  mode?: 'hero' | 'inspector' | 'roverOnly' | 'droneOnly';
   focusedAgentId?: string | null;
 }
 
@@ -49,6 +49,8 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
       camera.position.set(0, 7.5, 17.5);
     } else if (mode === 'roverOnly') {
       camera.position.set(2.8, 3.2, 5.5);
+    } else if (mode === 'droneOnly') {
+      camera.position.set(2.2, 2.4, 4.4);
     } else {
       camera.position.set(0, 5, 12);
     }
@@ -65,7 +67,7 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
     scene.add(ambient);
 
     // 3. Terrain
-    if (mode !== 'roverOnly') {
+    if (mode !== 'roverOnly' && mode !== 'droneOnly') {
       const terrain = createTopographicalTerrain();
       scene.add(terrain);
     }
@@ -85,6 +87,7 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
       { id: 'G1', group: gbData.group, wheels: gbData.wheels, mast: gbData.sensorMast, basePos: new THREE.Vector3(-0.6, -1.0, 3.8), speed: 0.5, name: 'GROUND-BOT', role: 'RESCUE', battery: 64 },
     ];
 
+    let droneOnlyRotors: THREE.Group[] = [];
     if (mode === 'roverOnly') {
       // Just focus on GroundBot
       const singleRover = createGroundBotRover();
@@ -98,6 +101,19 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
       const ring = new THREE.Mesh(ringGeo, ringMat);
       ring.rotation.x = -Math.PI / 2;
       ring.position.y = -0.6;
+      scene.add(ring);
+    } else if (mode === 'droneOnly') {
+      const singleDrone = createQuadcopterDrone();
+      singleDrone.group.position.set(0, 0, 0);
+      singleDrone.group.rotation.y = Math.PI / 6;
+      droneOnlyRotors = singleDrone.rotors;
+      scene.add(singleDrone.group);
+
+      const ringGeo = new THREE.RingGeometry(2.2, 2.22, 48);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.y = -0.8;
       scene.add(ring);
     } else {
       agentObjects.forEach((agent) => {
@@ -171,10 +187,18 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
         targetCam.y = 3.2 + mouseY * 0.6;
         camera.position.lerp(targetCam, 0.05);
         camera.lookAt(0, 0.4, 0);
+      } else if (mode === 'droneOnly') {
+        targetCam.x = 2.2 + mouseX * 0.8;
+        targetCam.y = 2.4 + mouseY * 0.6;
+        camera.position.lerp(targetCam, 0.05);
+        camera.lookAt(0, 0, 0);
+        droneOnlyRotors.forEach((rotor) => {
+          rotor.rotation.y += 0.35;
+        });
       }
 
       // Animate agent objects
-      if (mode !== 'roverOnly') {
+      if (mode !== 'roverOnly' && mode !== 'droneOnly') {
         agentObjects.forEach((agent) => {
           // Hover drift for drones
           if ('rotors' in agent && agent.rotors) {
