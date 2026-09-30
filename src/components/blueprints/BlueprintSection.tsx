@@ -9,8 +9,7 @@ import {
   Maximize2, 
   ShieldCheck, 
   CheckCircle2 
-} from 'lucide-
-react';
+} from 'lucide-react';
 import { playUiTick } from '../../utils/audio';
 
 interface BlueprintSpec {

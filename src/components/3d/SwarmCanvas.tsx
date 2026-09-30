@@ -62,9 +62,21 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 2. Ambient subtle lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 0.9);
+    // 2. Realistic Studio & Tactical Lighting
+    const ambient = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambient);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    keyLight.position.set(6, 12, 8);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x78d6a3, 0.9);
+    rimLight.position.set(-8, 3, -6);
+    scene.add(rimLight);
+
+    const fillLight = new THREE.DirectionalLight(0x4fa3e2, 0.7);
+    fillLight.position.set(0, -6, 8);
+    scene.add(fillLight);
 
     // 3. Terrain
     if (mode !== 'roverOnly' && mode !== 'droneOnly') {
@@ -88,12 +100,14 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
     ];
 
     let droneOnlyRotors: THREE.Group[] = [];
+    let singleRoverData: ReturnType<typeof createGroundBotRover> | null = null;
+
     if (mode === 'roverOnly') {
       // Just focus on GroundBot
-      const singleRover = createGroundBotRover();
-      singleRover.group.position.set(0, -0.6, 0);
-      singleRover.group.rotation.y = -Math.PI / 4;
-      scene.add(singleRover.group);
+      singleRoverData = createGroundBotRover();
+      singleRoverData.group.position.set(0, -0.6, 0);
+      singleRoverData.group.rotation.y = -Math.PI / 4;
+      scene.add(singleRoverData.group);
 
       // Add faint inspection ground rings
       const ringGeo = new THREE.RingGeometry(2.4, 2.42, 48);
@@ -187,6 +201,22 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
         targetCam.y = 3.2 + mouseY * 0.6;
         camera.position.lerp(targetCam, 0.05);
         camera.lookAt(0, 0.4, 0);
+        if (singleRoverData) {
+          singleRoverData.sensorMast.rotation.y = Math.sin(elapsed * 0.7) * 0.5;
+          singleRoverData.lidar.rotation.y += 0.08;
+          // Front steering oscillation
+          singleRoverData.frontSteering.forEach((pivot) => {
+            pivot.rotation.y = Math.sin(elapsed * 0.9) * 0.22;
+          });
+          // Wheels rolling forward
+          singleRoverData.wheels.forEach((w) => {
+            w.rotation.z += 0.015;
+          });
+          // Robotic arm subtle idle breathing
+          if (singleRoverData.roboticArm) {
+            singleRoverData.roboticArm.rotation.y = Math.sin(elapsed * 0.5) * 0.15;
+          }
+        }
       } else if (mode === 'droneOnly') {
         targetCam.x = 2.2 + mouseX * 0.8;
         targetCam.y = 2.4 + mouseY * 0.6;
@@ -199,6 +229,22 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
 
       // Animate agent objects
       if (mode !== 'roverOnly' && mode !== 'droneOnly') {
+        if (gbData.lidar) {
+          gbData.lidar.rotation.y += 0.08;
+        }
+        if (gbData.frontSteering) {
+          gbData.frontSteering.forEach((pivot) => {
+            pivot.rotation.y = Math.sin(elapsed * 0.9) * 0.22;
+          });
+        }
+        if (gbData.wheels) {
+          gbData.wheels.forEach((w) => {
+            w.rotation.z += 0.015;
+          });
+        }
+        if (gbData.roboticArm) {
+          gbData.roboticArm.rotation.y = Math.sin(elapsed * 0.5) * 0.15;
+        }
         agentObjects.forEach((agent) => {
           // Hover drift for drones
           if ('rotors' in agent && agent.rotors) {
