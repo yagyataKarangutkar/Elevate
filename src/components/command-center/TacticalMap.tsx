@@ -6,6 +6,11 @@ import { playUiTick } from '../../utils/audio';
 interface TacticalMapProps {
   agents: Agent[];
   survivorCoords: { x: number; y: number };
+  showSurvivor?: boolean;
+  routeBlocked?: boolean;
+  alternateRouteActive?: boolean;
+  d2RelayActive?: boolean;
+  groundFailed?: boolean;
   isReplanning?: boolean;
   replanApproved?: boolean;
   d3Offline?: boolean;
@@ -16,6 +21,11 @@ interface TacticalMapProps {
 export const TacticalMap: React.FC<TacticalMapProps> = ({
   agents,
   survivorCoords,
+  showSurvivor = false,
+  routeBlocked = false,
+  alternateRouteActive = false,
+  d2RelayActive = false,
+  groundFailed = false,
   isReplanning = false,
   replanApproved = false,
   d3Offline = false,
@@ -63,12 +73,20 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             { x: 520, y: 430 },
             { x: 550, y: 410 },
           ],
-      // Blocked route from D3 / Sector B to Survivor
+      // Blocked route from Ground-01 through Sector B corridor
       blockedRoute: [
-        { x: 560, y: 210 },
-        { x: 520, y: 260 },
-        { x: 480, y: 290 },
-        { x: 440, y: 320 },
+        { x: 520, y: 430 },
+        { x: 450, y: 380 },
+        { x: 390, y: 330 },
+        { x: 340, y: 270 },
+      ],
+      // Alternate Route B skirting debris towards Zone A
+      alternateRouteB: [
+        { x: 520, y: 430 },
+        { x: 420, y: 440 },
+        { x: 340, y: 390 },
+        { x: 280, y: 260 },
+        { x: 290, y: 160 },
       ],
       // Safe rescue route to Survivor
       safeRescueRoute: [
@@ -111,33 +129,75 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       // 1. Dark Topographical Background Contours
       drawTopographicalContours(ctx, width, height, time);
 
-      // 2. Wireframe Buildings / City Blocks in Sector A/B (matching reference)
+      // 2. Zone Boundaries (ZONE A, ZONE B, ZONE C)
+      drawZoneBoundaries(ctx);
+
+      // 3. Wireframe Buildings / City Blocks in Sector A/B (matching reference)
       drawWireframeBuildings(ctx);
 
-      // 3. Grid & Coordinate Crosshairs
+      // 4. Grid & Coordinate Crosshairs
       drawTacticalGrid(ctx, width, height);
 
-      // 4. Draw Routes
+      // 5. Draw Routes
       // Blocked Route (Red Dashed)
-      drawDashedRoute(ctx, routes.blockedRoute, '#F25D5D', 'BLOCKED ROUTE (DEBRIS)', true, time);
+      if (routeBlocked) {
+        drawDashedRoute(ctx, routes.blockedRoute, '#F25D5D', 'ROUTE BLOCKED (DEBRIS)', true, time);
+      }
 
-      // Safe Rescue Route
-      drawDashedRoute(
-        ctx,
-        routes.safeRescueRoute,
-        isReplanning ? '#F0AE63' : '#78D6A3',
-        isReplanning ? 'REPLANNING ROUTE...' : 'SAFE EXTRACTION ROUTE',
-        false,
-        time
-      );
+      // Alternate Route B (when active) or primary extraction route
+      if (alternateRouteActive) {
+        drawDashedRoute(
+          ctx,
+          routes.alternateRouteB,
+          '#78D6A3',
+          'ALTERNATE ROUTE B: FEASIBLE · 3.2km / 11m',
+          false,
+          time
+        );
+      } else if (!routeBlocked) {
+        // Safe Rescue Route
+        drawDashedRoute(
+          ctx,
+          routes.safeRescueRoute,
+          isReplanning ? '#F0AE63' : '#78D6A3',
+          isReplanning ? 'REPLANNING ROUTE...' : 'SAFE EXTRACTION ROUTE',
+          false,
+          time
+        );
+      }
 
-      // 5. Communication Mesh Links between Agents
+      // 6. Communication Mesh Links between Agents
       drawCommunicationMesh(ctx, agents, d3Offline, time);
 
-      // 6. Survivor Marker (Pulsing Radar Rings)
-      drawSurvivorTarget(ctx, survivorCoords.x, survivorCoords.y, time);
+      // Active Lifeline Relay between D2 and D3
+      if (d2RelayActive) {
+        drawLifelineRelay(ctx, time);
+      }
 
-      // 7. Draw Agents (with positions calculated along flight paths)
+      // Ground-02 Dispatch Vector
+      const hasG2 = agents.some((a) => a.id === 'G2' || a.name === 'GROUND-02');
+      if (hasG2) {
+        drawDashedRoute(
+          ctx,
+          [
+            { x: 520, y: 520 },
+            { x: 440, y: 430 },
+            { x: 360, y: 320 },
+            { x: 300, y: 160 },
+          ],
+          '#78D6A3',
+          'GROUND-02 DISPATCH VECTOR → ZONE A',
+          false,
+          time
+        );
+      }
+
+      // 7. Survivor Marker (Pulsing Radar Rings)
+      if (showSurvivor) {
+        drawSurvivorTarget(ctx, survivorCoords.x, survivorCoords.y, time);
+      }
+
+      // 8. Draw Agents (with positions calculated along flight paths)
       agents.forEach((agent) => {
         let posX = agent.coords.x;
         let posY = agent.coords.y;
@@ -162,7 +222,15 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             posY = 195;
           }
         } else if (agent.id === 'G1') {
-          if (replanApproved) {
+          if (groundFailed) {
+            posX = 520;
+            posY = 430;
+          } else if (alternateRouteActive) {
+            // Advancing along Alternate Route B
+            const progress = (time * 0.1) % 1;
+            posX = 520 - progress * (520 - 320);
+            posY = 430 - progress * (430 - 240);
+          } else if (replanApproved) {
             // GroundBot advancing towards survivor
             const progress = Math.min(1, ((time * 0.15) % 1.5));
             posX = 520 - progress * (520 - 440);
@@ -172,6 +240,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             posX = 520 + t;
             posY = 430;
           }
+        } else if (agent.id === 'G2' || agent.name === 'GROUND-02') {
+          // Ground-02 entering from forward depot at bottom towards survivor in Zone A
+          const progress = Math.min(1, (time * 0.08) % 1.2);
+          posX = 520 - progress * (520 - 300);
+          posY = 520 - progress * (520 - 160);
         }
 
         drawAgentMarker(
@@ -194,7 +267,98 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [viewMode, zoomLevel, agents, survivorCoords, isReplanning, replanApproved, d3Offline, hoveredAgent, selectedAgentId, routes]);
+  }, [viewMode, zoomLevel, agents, survivorCoords, showSurvivor, routeBlocked, isReplanning, replanApproved, d3Offline, hoveredAgent, selectedAgentId, routes]);
+
+  // Stylized disaster zone boundaries (ZONE A, ZONE B, ZONE C)
+  const drawZoneBoundaries = (ctx: CanvasRenderingContext2D) => {
+    ctx.save();
+    const zones = [
+      {
+        name: 'ZONE A',
+        tag: 'DANGER 91 · PRIORITY 01',
+        x: 180,
+        y: 60,
+        w: 260,
+        h: 200,
+        color: '#F25D5D',
+      },
+      {
+        name: 'ZONE B',
+        tag: 'DANGER 67 · PRIORITY 02',
+        x: 130,
+        y: 280,
+        w: 270,
+        h: 180,
+        color: '#F0AE63',
+      },
+      {
+        name: 'ZONE C',
+        tag: 'DANGER 43 · PRIORITY 03',
+        x: 460,
+        y: 80,
+        w: 250,
+        h: 220,
+        color: '#78D6A3',
+      },
+    ];
+
+    zones.forEach((z) => {
+      // Light background fill
+      ctx.fillStyle = `${z.color}08`;
+      ctx.fillRect(z.x, z.y, z.w, z.h);
+
+      // Dashed boundary
+      ctx.strokeStyle = `${z.color}35`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(z.x, z.y, z.w, z.h);
+      ctx.setLineDash([]);
+
+      // Corner technical brackets
+      const c = 8;
+      ctx.strokeStyle = z.color;
+      ctx.lineWidth = 1.5;
+
+      // Top Left
+      ctx.beginPath();
+      ctx.moveTo(z.x, z.y + c);
+      ctx.lineTo(z.x, z.y);
+      ctx.lineTo(z.x + c, z.y);
+      ctx.stroke();
+
+      // Top Right
+      ctx.beginPath();
+      ctx.moveTo(z.x + z.w - c, z.y);
+      ctx.lineTo(z.x + z.w, z.y);
+      ctx.lineTo(z.x + z.w, z.y + c);
+      ctx.stroke();
+
+      // Bottom Left
+      ctx.beginPath();
+      ctx.moveTo(z.x, z.y + z.h - c);
+      ctx.lineTo(z.x, z.y + z.h);
+      ctx.lineTo(z.x + c, z.y + z.h);
+      ctx.stroke();
+
+      // Bottom Right
+      ctx.beginPath();
+      ctx.moveTo(z.x + z.w - c, z.y + z.h);
+      ctx.lineTo(z.x + z.w, z.y + z.h);
+      ctx.lineTo(z.x + z.w, z.y + z.h - c);
+      ctx.stroke();
+
+      // Zone Label Badge
+      ctx.font = '600 10px "JetBrains Mono", monospace';
+      ctx.fillStyle = z.color;
+      ctx.fillText(z.name, z.x + 10, z.y + 16);
+
+      ctx.font = '8px "JetBrains Mono", monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fillText(z.tag, z.x + 10, z.y + 27);
+    });
+
+    ctx.restore();
+  };
 
   // Topographic contour curves
   const drawTopographicalContours = (
@@ -351,6 +515,42 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     ctx.restore();
   };
 
+  const drawLifelineRelay = (ctx: CanvasRenderingContext2D, time: number) => {
+    ctx.save();
+    // Coordinates for D2 and D3
+    const p1 = { x: 280, y: 360 };
+    const p2 = { x: 570, y: 195 };
+
+    ctx.strokeStyle = '#F0AE63';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 4]);
+    ctx.lineDashOffset = -time * 20;
+
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+
+    // Data packets traveling between D2 and D3
+    const packetT = (time * 0.8) % 1;
+    const px = p1.x + (p2.x - p1.x) * packetT;
+    const py = p1.y + (p2.y - p1.y) * packetT;
+
+    ctx.fillStyle = '#F0AE63';
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Midpoint label
+    const mx = (p1.x + p2.x) / 2;
+    const my = (p1.y + p2.y) / 2;
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F0AE63';
+    ctx.fillText('⚡ LIFELINE RELAY: DRONE-02 ⇄ DRONE-03', mx - 90, my - 8);
+
+    ctx.restore();
+  };
+
   const drawSurvivorTarget = (
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -359,15 +559,16 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
   ) => {
     ctx.save();
     // Expanding pulse radar rings
-    const ring1 = ((time * 20) % 45);
-    const ring2 = (((time * 20) + 22) % 45);
+    const ring1 = ((time * 24) % 55);
+    const ring2 = (((time * 24) + 27) % 55);
 
-    ctx.strokeStyle = 'rgba(240, 174, 99, 0.45)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(240, 174, 99, 0.6)';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(x, y, ring1, 0, Math.PI * 2);
     ctx.stroke();
 
+    ctx.strokeStyle = 'rgba(242, 93, 93, 0.4)';
     ctx.beginPath();
     ctx.arc(x, y, ring2, 0, Math.PI * 2);
     ctx.stroke();
@@ -375,17 +576,28 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     // Center pin
     ctx.fillStyle = '#F0AE63';
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Badge label
-    ctx.font = '600 10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F0AE63';
-    ctx.fillText('✦ Survivor #1', x + 12, y + 4);
+    // Crosshairs
+    const cSize = 10;
+    ctx.strokeStyle = '#F0AE63';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x - cSize, y);
+    ctx.lineTo(x + cSize, y);
+    ctx.moveTo(x, y - cSize);
+    ctx.lineTo(x, y + cSize);
+    ctx.stroke();
 
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(240, 174, 99, 0.7)';
-    ctx.fillText('CONFIRMED VITALS', x + 12, y + 14);
+    // Badge label
+    ctx.font = '700 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F0AE63';
+    ctx.fillText('✦ SURVIVOR DETECTED — ZONE A', x + 14, y + 2);
+
+    ctx.font = '600 8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#F25D5D';
+    ctx.fillText('MISSION-CRITICAL TARGET · VITALS CONFIRMED', x + 14, y + 13);
 
     ctx.restore();
   };
@@ -454,8 +666,10 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     }
 
     // Tag badge
-    const badgeText = `${agent.id}`;
+    const badgeText = agent.name || agent.code || agent.id;
     ctx.font = '600 10px "JetBrains Mono", monospace';
+    const textWidth = ctx.measureText(badgeText).width;
+    const bw = Math.max(36, textWidth + 12);
     ctx.fillStyle = '#050607';
 
     // Badge bubble
@@ -464,8 +678,8 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     ctx.fillStyle = isOffline ? 'rgba(242, 93, 93, 0.9)' : 'rgba(8, 10, 11, 0.9)';
     ctx.strokeStyle = isOffline ? '#F25D5D' : isWarning ? '#F0AE63' : 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 1;
-    ctx.fillRect(bx, by, 36, 16);
-    ctx.strokeRect(bx, by, 36, 16);
+    ctx.fillRect(bx, by, bw, 16);
+    ctx.strokeRect(bx, by, bw, 16);
 
     ctx.fillStyle = isOffline ? '#ffffff' : mainColor;
     ctx.fillText(badgeText, bx + 6, by + 12);
@@ -475,7 +689,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       const subText = isOffline ? 'OFFLINE (COMM LOST)' : `${agent.role} · ${agent.battery}%`;
       ctx.font = '9px "JetBrains Mono", monospace';
       ctx.fillStyle = isOffline ? '#F25D5D' : '#A7ADAB';
-      ctx.fillText(subText, bx + 42, by + 12);
+      ctx.fillText(subText, bx + bw + 6, by + 12);
     }
 
     ctx.restore();

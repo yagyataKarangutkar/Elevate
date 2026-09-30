@@ -88,8 +88,8 @@ export const AgentStatusPanel: React.FC<AgentStatusPanelProps> = ({
                 transition: 'all 0.2s ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {/* Status dot */}
                   <span
                     style={{
@@ -100,33 +100,25 @@ export const AgentStatusPanel: React.FC<AgentStatusPanelProps> = ({
                       boxShadow: `0 0 6px ${dotColor}`,
                     }}
                   />
-                  <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#F2F4F2' }}>
-                      {agent.id}
-                      <span style={{ marginLeft: '8px', fontWeight: 400, color: '#A7ADAB', fontSize: '11px' }}>
-                        {agent.name}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '10px', color: isOffline ? '#F25D5D' : '#68706D', marginTop: '1px' }}>
-                      {agent.task}
-                    </div>
-                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#F2F4F2', letterSpacing: '0.04em' }}>
+                    {agent.name || agent.code || agent.id}
+                  </span>
                 </div>
 
-                <div style={{ textAlign: 'right' }}>
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      color: isOffline ? '#F25D5D' : isWarning ? '#F0AE63' : '#F2F4F2',
-                    }}
-                  >
-                    {isOffline ? 'OFFLINE' : `${agent.battery}%`}
-                  </div>
-                  <div style={{ fontSize: '9px', color: '#68706D' }}>
-                    {isOffline ? '0% SIG' : `${agent.signal}% SIG`}
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                  <span style={{ color: isOffline ? '#F25D5D' : isWarning ? '#F0AE63' : '#F2F4F2', fontWeight: 500 }}>
+                    {isOffline ? 'OFFLINE' : `${agent.battery}% battery`}
+                  </span>
+                  <span style={{ color: '#68706D' }}>•</span>
+                  <span style={{ color: isOffline ? '#F25D5D' : '#A7ADAB' }}>
+                    {isOffline ? '0% signal' : `${agent.signal}% signal`}
+                  </span>
                 </div>
+              </div>
+
+              <div style={{ fontSize: '11px', color: isOffline ? '#F25D5D' : '#8A928F', marginTop: '2px', display: 'flex', gap: '6px' }}>
+                <span style={{ color: '#68706D', fontSize: '10px', fontWeight: 600 }}>TASK:</span>
+                <span style={{ color: isOffline ? '#F25D5D' : '#D0D5D3' }}>{agent.task}</span>
               </div>
 
               {/* Battery progress thin bar */}

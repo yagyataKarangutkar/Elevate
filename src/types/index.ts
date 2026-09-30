@@ -1,4 +1,4 @@
-export type AgentId = 'D1' | 'D2' | 'D3' | 'G1';
+export type AgentId = 'D1' | 'D2' | 'D3' | 'G1' | 'G2';
 
 export type AgentStatus = 'active' | 'warning' | 'critical' | 'offline' | 'completed';
 
@@ -36,6 +36,17 @@ export interface MissionEvent {
   detail?: string;
   agentId?: AgentId;
   level: 'info' | 'warning' | 'critical' | 'success';
+  priority?: boolean;
+}
+
+export interface CompletedMissionTelemetry {
+  tasksCompleted: string;
+  survivorsFound: number;
+  firstDetection: string;
+  coverage: string;
+  criticalUpdates: string;
+  deadlineStatus: string;
+  events: MissionEvent[];
 }
 
 export interface DecisionFactor {
@@ -69,4 +80,29 @@ export interface MissionState {
   events: MissionEvent[];
   approvalRequired: boolean;
   selectedAgentForInspection: AgentId | null;
+}
+
+export type FlowStep =
+  | 'landing'
+  | 'mission_input'
+  | 'plan_generation'
+  | 'mission_plan'
+  | 'command_center'
+  | 'mission_recovery'
+  | 'mission_complete'
+  | 'results';
+
+export interface MissionAgentConfig {
+  id: AgentId;
+  name: string;
+  type: string;
+  capabilities: string[];
+  battery: number;
+  signal: number;
+}
+
+export interface MissionConfig {
+  objective: string;
+  selectedAgentIds: AgentId[];
+  agents: MissionAgentConfig[];
 }
