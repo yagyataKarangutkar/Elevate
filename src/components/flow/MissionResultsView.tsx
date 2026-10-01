@@ -76,7 +76,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
         }}
       >
         {/* Header Section */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div
               style={{
@@ -152,7 +152,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: '14px',
           }}
         >
@@ -258,7 +258,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '8px',
-            overflow: 'hidden',
+            overflowX: 'auto',
             fontFamily: '"JetBrains Mono", monospace',
           }}
         >
@@ -285,6 +285,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
           <table
             style={{
               width: '100%',
+              minWidth: '640px',
               borderCollapse: 'collapse',
               textAlign: 'left',
               fontSize: '12px',

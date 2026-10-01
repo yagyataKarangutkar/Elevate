@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { SwarmCanvas } from '../3d/SwarmCanvas';
 import { ArrowRight } from 'lucide-react';
 import { playUiTick, playSuccessChirp } from '../../utils/audio';
@@ -11,46 +12,62 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
   onEnterMissionControl,
   onExplorePlan,
 }) => {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isStacked = windowWidth < 1024;
+
   return (
     <section
       style={{
         position: 'relative',
-        minHeight: 'calc(100vh - 70px)',
+        minHeight: isStacked ? 'auto' : 'calc(100vh - 70px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '24px 48px',
+        padding: isMobile ? '20px 16px' : isTablet ? '24px 32px' : '24px 48px',
         overflow: 'hidden',
       }}
     >
-      {/* Main Split Grid: Left Text Zone & Right 3D Swarm Model Zone */}
+      {/* Main Split / Stack Layout */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(420px, 460px) 1fr',
-          gap: '24px',
+          display: isStacked ? 'flex' : 'grid',
+          flexDirection: isStacked ? 'column' : undefined,
+          gridTemplateColumns: isStacked ? undefined : 'minmax(380px, 460px) 1fr',
+          gap: isMobile ? '20px' : '32px',
           alignItems: 'center',
           flex: 1,
-          minHeight: '580px',
+          minHeight: isStacked ? 'auto' : '560px',
           position: 'relative',
         }}
       >
-        {/* Left Column: Text & CTA (Completely separated, no overlap) */}
+        {/* Text & CTA Zone */}
         <div
           style={{
             zIndex: 10,
-            maxWidth: '460px',
+            maxWidth: isStacked ? '100%' : '460px',
             pointerEvents: 'auto',
+            width: '100%',
           }}
         >
           {/* Eyebrow */}
           <div
             style={{
               fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '11px',
+              fontSize: isMobile ? '10px' : '11px',
               color: '#68706D',
               letterSpacing: '0.12em',
-              marginBottom: '18px',
+              marginBottom: '14px',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -60,15 +77,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <span>AI AUTONOMOUS SWARM COMMAND PLATFORM</span>
           </div>
 
-          {/* Hero Title per Spec Section 6 */}
+          {/* Hero Title per Spec Section 6 & 8 */}
           <h1
             style={{
-              fontSize: '42px',
+              fontSize: 'clamp(28px, 5.5vw, 44px)',
               fontWeight: 400,
               lineHeight: 1.15,
               letterSpacing: '-0.03em',
               color: '#F2F4F2',
-              marginBottom: '16px',
+              marginBottom: '14px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
@@ -83,47 +100,49 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
           <p
             style={{
               color: '#8D9693',
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px',
               lineHeight: 1.6,
-              marginBottom: '32px',
-              maxWidth: '440px',
+              marginBottom: isMobile ? '20px' : '28px',
+              maxWidth: '460px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
             MissionMind coordinates 3 drones and 1 GroundBot to search, adapt and rescue — without needing you to control every robot.
           </p>
 
-          {/* CTA Buttons per Spec Section 6 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* CTA Buttons (Touch target min 44px per Spec §25 & §46) */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
             <button
               onClick={() => {
                 playSuccessChirp();
                 onEnterMissionControl();
               }}
               style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.28)',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
                 color: '#F2F4F2',
                 padding: '12px 24px',
+                minHeight: '44px',
                 borderRadius: '6px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
                 letterSpacing: '0.04em',
-                fontWeight: 500,
+                fontWeight: 600,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 backdropFilter: 'blur(6px)',
-                transition: 'all 0.25s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
+                transition: 'all 0.2s ease',
+                flex: isMobile ? '1 1 160px' : 'none',
               }}
             >
               <span>Try a Mission</span>
@@ -137,54 +156,61 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               }}
               style={{
                 background: 'transparent',
-                border: 'none',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: '#A7ADAB',
-                padding: '12px 16px',
+                padding: '12px 18px',
+                minHeight: '44px',
+                borderRadius: '6px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
+                flex: isMobile ? '1 1 140px' : 'none',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#A7ADAB')}
             >
               <span>See How It Works ↓</span>
             </button>
           </div>
         </div>
 
-        {/* Right Column: 3D Swarm Digital Twin Model Container */}
+        {/* Right / Center 3D Swarm Model Container (Spec §11–§14: ALWAYS rendered on phone!) */}
         <div
           style={{
             position: 'relative',
             width: '100%',
-            height: '100%',
-            minHeight: '580px',
+            height: isMobile ? '380px' : isTablet ? '460px' : '100%',
+            minHeight: isMobile ? '360px' : '520px',
             overflow: 'hidden',
+            borderRadius: '8px',
+            background: 'rgba(255, 255, 255, 0.01)',
           }}
         >
           <SwarmCanvas mode="hero" interactive={true} />
         </div>
       </div>
 
-      {/* Bottom Telemetry Strip per Spec Section 7 */}
+      {/* Bottom Telemetry Strip per Spec Section 7 & 22 */}
       <div
         style={{
           position: 'relative',
           zIndex: 10,
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          paddingTop: '18px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          paddingTop: '16px',
+          marginTop: isStacked ? '20px' : '0',
           display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          gap: '10px',
         }}
       >
         <div
           style={{
             fontFamily: '"Inter", sans-serif',
-            fontSize: '13px',
+            fontSize: isMobile ? '12px' : '13px',
             fontWeight: 500,
             color: '#F2F4F2',
             display: 'flex',
@@ -199,11 +225,12 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         <div
           style={{
             display: 'flex',
-            gap: '28px',
+            flexWrap: 'wrap',
+            gap: isMobile ? '12px' : '24px',
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
+            fontSize: isMobile ? '10px' : '11px',
             color: '#68706D',
-            letterSpacing: '0.08em',
+            letterSpacing: '0.06em',
           }}
         >
           <div>
@@ -218,9 +245,8 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <strong style={{ color: '#A7ADAB', fontWeight: 600 }}>1</strong> STANDBY
           </div>
           <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#78D6A3' }} />
-            <span style={{ color: '#F2F4F2' }}>MISSION READY</span>
+          <div style={{ color: '#78D6A3', fontWeight: 600 }}>
+            MISSION READY
           </div>
         </div>
       </div>

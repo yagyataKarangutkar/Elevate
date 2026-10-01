@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SwarmCanvas } from '../3d/SwarmCanvas';
 import { Network, ShieldCheck, GitFork, Compass } from 'lucide-react';
-import { playUiTick } from '../../utils/audio';
 
 export const AboutFeaturesSection: React.FC = () => {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isStacked = windowWidth < 1024;
+
   const capabilities = [
     {
       icon: <Compass size={16} color="#78D6A3" />,
@@ -35,7 +48,7 @@ export const AboutFeaturesSection: React.FC = () => {
     <section
       id="about"
       style={{
-        padding: '90px 48px',
+        padding: isMobile ? '60px 16px' : isTablet ? '72px 32px' : '90px 48px',
         maxWidth: '1360px',
         margin: '0 auto',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -45,10 +58,10 @@ export const AboutFeaturesSection: React.FC = () => {
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '11px',
+          fontSize: isMobile ? '10px' : '11px',
           color: '#68706D',
           letterSpacing: '0.12em',
-          marginBottom: '16px',
+          marginBottom: '14px',
         }}
       >
         02. ABOUT MISSIONMIND
@@ -56,22 +69,23 @@ export const AboutFeaturesSection: React.FC = () => {
 
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '48px',
+          display: isStacked ? 'flex' : 'grid',
+          flexDirection: isStacked ? 'column' : undefined,
+          gridTemplateColumns: isStacked ? undefined : '1.2fr 1fr',
+          gap: isMobile ? '28px' : '48px',
           alignItems: 'center',
         }}
       >
         {/* Left Side: Editorial & 4 Cards */}
-        <div>
+        <div style={{ width: '100%' }}>
           <h2
             style={{
-              fontSize: '36px',
+              fontSize: 'clamp(26px, 4.5vw, 36px)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               color: '#F2F4F2',
               lineHeight: 1.2,
-              marginBottom: '16px',
+              marginBottom: '14px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
@@ -81,10 +95,10 @@ export const AboutFeaturesSection: React.FC = () => {
           <p
             style={{
               color: '#A7ADAB',
-              fontSize: '15px',
-              lineHeight: 1.65,
+              fontSize: isMobile ? '13px' : '15px',
+              lineHeight: 1.6,
               maxWidth: '520px',
-              marginBottom: '36px',
+              marginBottom: isMobile ? '24px' : '36px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
@@ -95,110 +109,105 @@ export const AboutFeaturesSection: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              gap: '14px',
             }}
           >
-            {capabilities.map((cap, idx) => (
+            {capabilities.map((item, idx) => (
               <div
                 key={idx}
-                onMouseEnter={() => playUiTick()}
                 style={{
-                  background: '#080A0B',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '6px',
-                  padding: '18px',
-                  transition: 'all 0.25s ease',
-                  cursor: 'default',
+                  padding: isMobile ? '16px 14px' : '20px 18px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.background = '#080A0B';
+                  gap: '8px',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <div>{cap.icon}</div>
-                    <span
-                      style={{
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: '9px',
-                        color: '#68706D',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      {cap.techLabel}
-                    </span>
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div
                     style={{
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: '#F2F4F2',
-                      marginBottom: '6px',
-                      fontFamily: '"Inter", sans-serif',
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '4px',
+                      background: 'rgba(120, 214, 163, 0.1)',
+                      border: '1px solid rgba(120, 214, 163, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
-                    {cap.title}
+                    {item.icon}
                   </div>
-                  <div
+                  <span
                     style={{
-                      fontSize: '12px',
-                      color: '#8D9693',
-                      lineHeight: 1.5,
-                      fontFamily: '"Inter", sans-serif',
+                      fontSize: '9.5px',
+                      fontFamily: '"JetBrains Mono", monospace',
+                      color: '#68706D',
                     }}
                   >
-                    {cap.desc}
-                  </div>
+                    0{idx + 1}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: 600,
+                    color: '#F2F4F2',
+                    fontFamily: '"Inter", sans-serif',
+                  }}
+                >
+                  {item.title}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: isMobile ? '12px' : '12.5px',
+                    color: '#8D9693',
+                    lineHeight: 1.5,
+                    fontFamily: '"Inter", sans-serif',
+                  }}
+                >
+                  {item.desc}
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '4px',
+                    fontSize: '10px',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    color: '#78D6A3',
+                    background: 'rgba(120, 214, 163, 0.08)',
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    width: 'fit-content',
+                  }}
+                >
+                  {item.techLabel}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right Side: Drone Wireframe Showcase with Tags */}
+        {/* Right Side: 3D Swarm Model Display (Spec §23: ALWAYS visible on mobile!) */}
         <div
           style={{
             position: 'relative',
-            height: '420px',
+            width: '100%',
+            height: isMobile ? '340px' : isTablet ? '420px' : '520px',
+            minHeight: isMobile ? '320px' : '460px',
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '8px',
+            borderRadius: '10px',
             overflow: 'hidden',
           }}
         >
-          <SwarmCanvas mode="inspector" interactive={true} />
-
-          {/* Technical feature badges matching top-right screenshot */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '10px',
-              letterSpacing: '0.08em',
-              color: '#68706D',
-              pointerEvents: 'none',
-              textAlign: 'right',
-            }}
-          >
-            <div>DRONES</div>
-            <div>GROUND ROBOTS</div>
-            <div>RELAY NODES</div>
-            <div style={{ color: '#78D6A3' }}>REAL-TIME SYNC</div>
-          </div>
+          <SwarmCanvas mode="hero" interactive={true} />
         </div>
       </div>
     </section>

@@ -210,6 +210,19 @@ const BLUEPRINTS_DATA: Record<string, BlueprintSpec> = {
 export const BlueprintSection: React.FC = () => {
   const [selectedUnitId, setSelectedUnitId] = useState<'specter' | 'argus' | 'aegis'>('specter');
   const [activeTab, setActiveTab] = useState<'specs' | 'subsystems' | 'telemetry'>('specs');
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isStacked = windowWidth < 1024;
 
   const unit = BLUEPRINTS_DATA[selectedUnitId];
 
@@ -227,7 +240,7 @@ export const BlueprintSection: React.FC = () => {
     <section
       id="blueprints"
       style={{
-        padding: '90px 48px',
+        padding: isMobile ? '60px 16px' : isTablet ? '72px 32px' : '90px 48px',
         maxWidth: '1360px',
         margin: '0 auto',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -341,9 +354,10 @@ export const BlueprintSection: React.FC = () => {
       {/* Main Interactive Blueprint Showcase Grid */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1.25fr 1fr',
-          gap: '28px',
+          display: isStacked ? 'flex' : 'grid',
+          flexDirection: isStacked ? 'column' : undefined,
+          gridTemplateColumns: isStacked ? undefined : '1.25fr 1fr',
+          gap: '24px',
           alignItems: 'stretch',
         }}
       >
@@ -355,7 +369,8 @@ export const BlueprintSection: React.FC = () => {
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '10px',
             overflow: 'hidden',
-            minHeight: '520px',
+            minHeight: isMobile ? '360px' : '500px',
+            height: isMobile ? '380px' : 'auto',
             display: 'flex',
             flexDirection: 'column',
           }}

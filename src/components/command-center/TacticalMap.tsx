@@ -111,14 +111,15 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       const width = (canvas.width = canvas.parentElement?.clientWidth || 800);
       const height = (canvas.height = canvas.parentElement?.clientHeight || 550);
 
-      // Coordinate scaling based on zoom
+      // Coordinate scaling based on zoom and mobile width
       ctx.clearRect(0, 0, width, height);
 
       ctx.save();
-      // Apply center zoom
+      const baseScale = width < 780 ? Math.max(0.45, width / 780) : 1.0;
+      const totalScale = zoomLevel * baseScale;
       ctx.translate(width / 2, height / 2);
-      ctx.scale(zoomLevel, zoomLevel);
-      ctx.translate(-width / 2, -height / 2);
+      ctx.scale(totalScale, totalScale);
+      ctx.translate(-400, -280);
 
       // Perspective tilt if 3D mode
       if (viewMode === '3d') {
@@ -127,7 +128,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       }
 
       // 1. Dark Topographical Background Contours
-      drawTopographicalContours(ctx, width, height, time);
+      drawTopographicalContours(ctx, Math.max(width, 850), Math.max(height, 600), time);
 
       // 2. Zone Boundaries (ZONE A, ZONE B, ZONE C)
       drawZoneBoundaries(ctx);
@@ -712,19 +713,59 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         ref={canvasRef}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
-          const mx = e.clientX - rect.left;
-          const my = e.clientY - rect.top;
+          const baseScale = rect.width < 780 ? Math.max(0.45, rect.width / 780) : 1.0;
+          const totalScale = zoomLevel * baseScale;
+          const px = e.clientX - rect.left;
+          const py = e.clientY - rect.top;
+          const vx = (px - rect.width / 2) / totalScale + 400;
+          const vy = (py - rect.height / 2) / totalScale + 280;
+
           const found = agents.find((a) => {
-            const dx = a.coords.x - mx;
-            const dy = a.coords.y - my;
-            return Math.sqrt(dx * dx + dy * dy) < 30;
+            const dx = a.coords.x - vx;
+            const dy = a.coords.y - vy;
+            return Math.sqrt(dx * dx + dy * dy) < 40;
           });
           setHoveredAgent(found ? found.id : null);
         }}
-        onClick={() => {
-          if (hoveredAgent && onSelectAgent) {
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const baseScale = rect.width < 780 ? Math.max(0.45, rect.width / 780) : 1.0;
+          const totalScale = zoomLevel * baseScale;
+          const px = e.clientX - rect.left;
+          const py = e.clientY - rect.top;
+          const vx = (px - rect.width / 2) / totalScale + 400;
+          const vy = (py - rect.height / 2) / totalScale + 280;
+
+          const found = agents.find((a) => {
+            const dx = a.coords.x - vx;
+            const dy = a.coords.y - vy;
+            return Math.sqrt(dx * dx + dy * dy) < 40;
+          });
+          if (found && onSelectAgent) {
             playUiTick();
-            onSelectAgent(hoveredAgent);
+            onSelectAgent(found.id);
+          }
+        }}
+        onTouchStart={(e) => {
+          if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            const rect = e.currentTarget.getBoundingClientRect();
+            const baseScale = rect.width < 780 ? Math.max(0.45, rect.width / 780) : 1.0;
+            const totalScale = zoomLevel * baseScale;
+            const px = touch.clientX - rect.left;
+            const py = touch.clientY - rect.top;
+            const vx = (px - rect.width / 2) / totalScale + 400;
+            const vy = (py - rect.height / 2) / totalScale + 280;
+
+            const found = agents.find((a) => {
+              const dx = a.coords.x - vx;
+              const dy = a.coords.y - vy;
+              return Math.sqrt(dx * dx + dy * dy) < 45;
+            });
+            if (found && onSelectAgent) {
+              playUiTick();
+              onSelectAgent(found.id);
+            }
           }
         }}
         style={{
@@ -732,6 +773,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
           height: '100%',
           display: 'block',
           cursor: 'crosshair',
+          touchAction: 'manipulation',
         }}
       />
 

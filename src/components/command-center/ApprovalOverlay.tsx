@@ -22,13 +22,13 @@ export const ApprovalOverlay: React.FC<ApprovalOverlayProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(5, 6, 7, 0.82)',
+        backgroundColor: 'rgba(5, 6, 7, 0.85)',
         backdropFilter: 'blur(10px)',
         zIndex: 100,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px',
+        padding: 'clamp(12px, 3vw, 24px)',
         animation: 'fadeIn 0.25s ease',
       }}
     >
@@ -36,10 +36,12 @@ export const ApprovalOverlay: React.FC<ApprovalOverlayProps> = ({
         style={{
           width: '100%',
           maxWidth: '580px',
+          maxHeight: '92vh',
+          overflowY: 'auto',
           background: '#080A0B',
           border: '1px solid rgba(240, 174, 99, 0.5)',
           borderRadius: '8px',
-          padding: '30px',
+          padding: 'clamp(18px, 4vw, 30px)',
           boxShadow: '0 0 50px rgba(0, 0, 0, 0.85), 0 0 24px rgba(240, 174, 99, 0.12)',
           fontFamily: '"JetBrains Mono", monospace',
           position: 'relative',
@@ -228,14 +230,15 @@ export const ApprovalOverlay: React.FC<ApprovalOverlayProps> = ({
 
         {/* Action Buttons & Alternative Flow per Spec Section 28 & 31 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button
               onClick={() => {
                 playSuccessChirp();
                 onApprove();
               }}
               style={{
-                flex: 1.4,
+                flex: '1 1 200px',
+                minHeight: '44px',
                 background: '#F2F4F2',
                 color: '#050607',
                 border: 'none',
@@ -261,7 +264,8 @@ export const ApprovalOverlay: React.FC<ApprovalOverlayProps> = ({
                 setShowAlternativeMenu(!showAlternativeMenu);
               }}
               style={{
-                flex: 1,
+                flex: '1 1 180px',
+                minHeight: '44px',
                 background: 'transparent',
                 color: '#A7ADAB',
                 border: '1px solid rgba(255, 255, 255, 0.2)',

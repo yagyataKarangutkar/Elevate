@@ -53,6 +53,18 @@ export const MissionAssistantDrawer: React.FC<MissionAssistantDrawerProps> = ({
     }
   }, [isOpen, messages, isTyping]);
 
+  const [isMobile, setIsMobile] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Esc key listener (Spec §48, §49)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -131,22 +143,39 @@ export const MissionAssistantDrawer: React.FC<MissionAssistantDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: 'min(420px, 94vw)',
-        background: '#07090A',
-        borderLeft: '1px solid rgba(255, 255, 255, 0.14)',
-        boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.7)',
-        zIndex: 1100,
-        display: 'flex',
-        flexDirection: 'column',
-        animation: 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
+    <>
+      {isMobile && (
+        <div
+          onClick={onClose}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 1099,
+          }}
+        />
+      )}
+      <div
+        style={{
+          position: 'fixed',
+          top: isMobile ? 'auto' : 0,
+          right: 0,
+          bottom: 0,
+          left: isMobile ? 0 : 'auto',
+          width: isMobile ? '100%' : 'min(420px, 94vw)',
+          height: isMobile ? '90vh' : '100%',
+          background: '#07090A',
+          borderLeft: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.14)',
+          borderTop: isMobile ? '1px solid rgba(120, 214, 163, 0.4)' : 'none',
+          borderRadius: isMobile ? '16px 16px 0 0' : '0',
+          boxShadow: isMobile ? '0 -8px 32px rgba(0, 0, 0, 0.8)' : '-8px 0 32px rgba(0, 0, 0, 0.7)',
+          zIndex: 1100,
+          display: 'flex',
+          flexDirection: 'column',
+          animation: isMobile ? 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
       {/* 1. Header (Spec §7) */}
       <AssistantHeader onClose={onClose} />
 
@@ -302,6 +331,7 @@ export const MissionAssistantDrawer: React.FC<MissionAssistantDrawerProps> = ({
       <div
         style={{
           padding: '14px 20px',
+          paddingBottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
           borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           background: 'rgba(8, 10, 11, 0.98)',
         }}
@@ -353,8 +383,8 @@ export const MissionAssistantDrawer: React.FC<MissionAssistantDrawerProps> = ({
               border: 'none',
               borderRadius: '4px',
               color: inputValue.trim() && !isTyping ? '#050607' : '#68706D',
-              width: '28px',
-              height: '28px',
+              width: isMobile ? '36px' : '28px',
+              height: isMobile ? '36px' : '28px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -381,5 +411,6 @@ export const MissionAssistantDrawer: React.FC<MissionAssistantDrawerProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };

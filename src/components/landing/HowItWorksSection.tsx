@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Target, 
   Cpu, 
@@ -123,13 +123,27 @@ interface HowItWorksSectionProps {
 
 export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMission }) => {
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isStacked = windowWidth < 1024;
+
   const currentStep = STEPS[activeStepIndex];
 
   return (
     <section
       id="how-it-works"
       style={{
-        padding: '90px 48px',
+        padding: isMobile ? '60px 16px' : isTablet ? '72px 32px' : '90px 48px',
         maxWidth: '1360px',
         margin: '0 auto',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -139,41 +153,36 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
       <div
         style={{
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '11px',
+          fontSize: isMobile ? '10px' : '11px',
           color: '#68706D',
           letterSpacing: '0.12em',
-          marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
+          marginBottom: '14px',
         }}
       >
-        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#78D6A3' }} />
-        <span>HOW IT WORKS · THE 7-STEP MISSION JOURNEY</span>
+        01. HOW MISSIONMIND WORKS
       </div>
 
       {/* Section Header */}
-      <div style={{ marginBottom: '40px' }}>
+      <div style={{ marginBottom: isMobile ? '24px' : '36px' }}>
         <h2
           style={{
-            fontSize: '36px',
+            fontSize: 'clamp(26px, 4.5vw, 36px)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             color: '#F2F4F2',
             lineHeight: 1.2,
-            marginBottom: '12px',
+            marginBottom: '14px',
             fontFamily: '"Inter", sans-serif',
           }}
         >
-          One objective. Continuous coordination. Adaptive recovery.
+          From goal to execution — in seven steps.
         </h2>
         <p
           style={{
             color: '#A7ADAB',
-            fontSize: '15px',
+            fontSize: isMobile ? '13px' : '15px',
             lineHeight: 1.6,
             maxWidth: '680px',
-            margin: 0,
             fontFamily: '"Inter", sans-serif',
           }}
         >
@@ -181,13 +190,13 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
         </p>
       </div>
 
-      {/* Interactive 7 Steps Stepper Strip */}
+      {/* Interactive 7 Steps Stepper Strip (Responsive horizontal scroll / wrap on phone) */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
+          gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(130px, 1fr))' : 'repeat(7, 1fr)',
           gap: '8px',
-          marginBottom: '28px',
+          marginBottom: '24px',
         }}
       >
         {STEPS.map((s, idx) => {
@@ -203,12 +212,12 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
                 background: isActive ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
                 border: `1px solid ${isActive ? '#78D6A3' : 'rgba(255, 255, 255, 0.1)'}`,
                 borderRadius: '6px',
-                padding: '12px 10px',
+                padding: isMobile ? '10px 8px' : '12px 10px',
                 cursor: 'pointer',
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px',
+                gap: '4px',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -244,47 +253,51 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
         })}
       </div>
 
-      {/* Main Focus Card for Active Step */}
+      {/* Main Focus Card for Active Step (Responsive 1-col on mobile, 2-col on desktop) */}
       <div
         style={{
           background: '#080A0B',
           border: '1px solid rgba(255, 255, 255, 0.14)',
           borderRadius: '8px',
-          padding: '36px',
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '40px',
+          padding: isMobile ? '20px 16px' : '36px',
+          display: isStacked ? 'flex' : 'grid',
+          flexDirection: isStacked ? 'column' : undefined,
+          gridTemplateColumns: isStacked ? undefined : '1.2fr 1fr',
+          gap: isMobile ? '24px' : '40px',
           alignItems: 'center',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
         }}
       >
-        {/* Left Side: Step Narrative */}
+        {/* Left Side: Story Details */}
         <div>
           <div
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
               fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '11px',
+              fontSize: '10px',
               color: '#78D6A3',
               letterSpacing: '0.1em',
               marginBottom: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
+              padding: '3px 8px',
+              background: 'rgba(120, 214, 163, 0.1)',
+              borderRadius: '3px',
+              border: '1px solid rgba(120, 214, 163, 0.25)',
             }}
           >
-            <span>STEP 0{currentStep.step} OF 07</span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.2)' }}>•</span>
-            <span style={{ color: '#A7ADAB' }}>{currentStep.title}</span>
+            <span>STEP 0{currentStep.step}</span>
+            <span>·</span>
+            <span>{currentStep.title}</span>
           </div>
 
           <h3
             style={{
-              fontSize: '28px',
-              fontWeight: 400,
+              fontSize: isMobile ? '20px' : '26px',
+              fontWeight: 500,
               color: '#F2F4F2',
+              marginBottom: '12px',
               letterSpacing: '-0.02em',
-              lineHeight: 1.25,
-              marginBottom: '14px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
@@ -293,97 +306,68 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
 
           <p
             style={{
-              fontSize: '15px',
+              fontSize: isMobile ? '13px' : '14px',
               color: '#A7ADAB',
               lineHeight: 1.6,
-              marginBottom: '24px',
+              marginBottom: '20px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
             {currentStep.supporting}
           </p>
 
-          {/* Example Quote / Action Box */}
+          {/* Example callout box */}
           <div
             style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '6px',
-              padding: '16px 20px',
+              padding: '14px 16px',
               fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '13px',
+              fontSize: isMobile ? '11px' : '12px',
               color: '#F2F4F2',
-              whiteSpace: 'pre-line',
               lineHeight: 1.6,
+              whiteSpace: 'pre-line',
               marginBottom: '20px',
             }}
           >
+            <div style={{ fontSize: '9.5px', color: '#68706D', letterSpacing: '0.08em', marginBottom: '4px' }}>
+              EXAMPLE IN ACTION
+            </div>
             {currentStep.example}
           </div>
 
           {currentStep.technicalLabel && (
-            <div
-              style={{
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '10px',
-                color: '#68706D',
-                letterSpacing: '0.08em',
-              }}
-            >
-              TECHNICAL SUB-LAYER: <span style={{ color: '#A7ADAB' }}>{currentStep.technicalLabel}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#68706D', fontFamily: '"JetBrains Mono", monospace' }}>
+              <ShieldCheck size={13} color="#78D6A3" />
+              <span>Technical core: {currentStep.technicalLabel}</span>
             </div>
           )}
         </div>
 
-        {/* Right Side: Visual Context & Telemetry Snapshot */}
+        {/* Right Side: Step Interactive Telemetry Preview */}
         <div
           style={{
             background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '6px',
-            padding: '24px',
+            padding: isMobile ? '16px' : '24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '20px',
+            gap: '16px',
+            width: '100%',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingBottom: '12px',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '11px',
-                color: '#A7ADAB',
-                letterSpacing: '0.06em',
-                fontWeight: 600,
-              }}
-            >
-              STAGE VERIFICATION
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '10px' }}>
+            <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: '#8D9693' }}>
+              STEP {currentStep.step} / 07 TELEMETRY
             </span>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '10px',
-                color: '#78D6A3',
-                fontFamily: '"JetBrains Mono", monospace',
-              }}
-            >
-              <ShieldCheck size={12} />
-              <span>ACTIVE FLOW</span>
+            <span style={{ fontSize: '10px', color: '#78D6A3', fontFamily: '"JetBrains Mono", monospace' }}>
+              ACTIVE
             </span>
           </div>
 
-          {/* Key metrics / preview items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {currentStep.previewData?.map((item, i) => (
               <div
                 key={i}
@@ -392,34 +376,28 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '12px',
-                  padding: '8px 10px',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  borderRadius: '4px',
+                  fontSize: isMobile ? '11px' : '12px',
                 }}
               >
-                <span style={{ color: '#8D9693' }}>{item.label}</span>
+                <span style={{ color: '#68706D' }}>{item.label}</span>
                 <span style={{ color: '#F2F4F2', fontWeight: 600 }}>{item.value}</span>
               </div>
             ))}
           </div>
 
-          {/* Quick CTA to try mission */}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          {onTryMission && (
             <button
-              onClick={() => {
-                playUiTick();
-                setActiveStepIndex((prev) => (prev + 1) % STEPS.length);
-              }}
+              onClick={onTryMission}
               style={{
-                flex: 1,
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                marginTop: '10px',
+                background: '#F2F4F2',
+                color: '#050607',
+                border: 'none',
                 borderRadius: '4px',
-                color: '#F2F4F2',
                 padding: '10px 14px',
-                fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '11px',
+                fontWeight: 600,
+                fontFamily: '"JetBrains Mono", monospace',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -427,32 +405,10 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onTryMissi
                 gap: '6px',
               }}
             >
-              <span>Next Step ({activeStepIndex + 1}/7)</span>
+              <span>Try Live in Mission Control</span>
               <ArrowRight size={12} />
             </button>
-
-            {onTryMission && (
-              <button
-                onClick={onTryMission}
-                style={{
-                  background: '#F2F4F2',
-                  border: 'none',
-                  borderRadius: '4px',
-                  color: '#050607',
-                  padding: '10px 16px',
-                  fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span>Try a Mission →</span>
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </section>

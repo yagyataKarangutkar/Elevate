@@ -27,6 +27,7 @@ import {
   CheckCircle2,
   X,
   Sparkles,
+  Menu,
 } from 'lucide-react';
 import { MissionAssistantDrawer } from '../ai-assistant';
 import type { MissionAssistantContext } from '../../types/assistant';
@@ -174,6 +175,26 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   const [showLifelineModal, setShowLifelineModal] = useState<boolean>(false);
   const [approvalRequired, setApprovalRequired] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
+  const [isMobile, setIsMobile] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setIsDesktop(w >= 1024);
+      setIsMobile(w < 768);
+      if (w >= 1024) {
+        setMobileSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Agents & Events
   const [agents, setAgents] = useState<Agent[]>(INITIAL_DEMO_AGENTS);
@@ -873,6 +894,218 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     { label: 'Settings', subtitle: 'Configure simulation & alerts.', icon: <Sliders size={14} /> },
   ];
 
+  const renderSidebarNav = (onItemClick?: () => void) => (
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {navItems.map((item) => {
+          const isActive = activeTab === item.label;
+          return (
+            <button
+              key={item.label}
+              onClick={() => {
+                playUiTick();
+                setActiveTab(item.label);
+                onItemClick?.();
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                padding: '8px 10px',
+                borderRadius: '4px',
+                border: 'none',
+                background: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                color: isActive ? '#F2F4F2' : '#68706D',
+                fontSize: '11px',
+                fontWeight: isActive ? 500 : 400,
+                fontFamily: '"Inter", sans-serif',
+                textAlign: 'left',
+                cursor: 'pointer',
+                borderLeft: isActive ? '2px solid #78D6A3' : '2px solid transparent',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ marginTop: '2px', color: isActive ? '#78D6A3' : '#68706D' }}>
+                {item.icon}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ color: isActive ? '#F2F4F2' : '#A7ADAB', fontWeight: 600 }}>{item.label}</span>
+                <span style={{ fontSize: '9.5px', color: '#68706D', marginTop: '1px', lineHeight: 1.25 }}>
+                  {item.subtitle}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* DEMO / SIMULATION CONTROLS */}
+      <div
+        style={{
+          marginTop: '12px',
+          padding: '10px 8px',
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '6px',
+          fontFamily: '"JetBrains Mono", monospace',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '10px',
+            color: '#A7ADAB',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <Zap size={11} color="#F0AE63" />
+          <span>DEMO CONTROLS</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <button
+            onClick={() => {
+              handleSurvivorDetected();
+              onItemClick?.();
+            }}
+            style={{
+              padding: '6px 8px',
+              background: showSurvivor ? 'rgba(240, 174, 99, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+              border: showSurvivor ? '1px solid #F0AE63' : '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '4px',
+              color: showSurvivor ? '#F0AE63' : '#F2F4F2',
+              fontSize: '9.5px',
+              fontWeight: 600,
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Target size={11} />
+            <span>SURVIVOR DETECTED</span>
+          </button>
+
+          <button
+            onClick={() => {
+              handleDrone3SignalLoss();
+              onItemClick?.();
+            }}
+            style={{
+              padding: '6px 8px',
+              background: d3Offline ? 'rgba(242, 93, 93, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+              border: d3Offline ? '1px solid #F25D5D' : '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '4px',
+              color: d3Offline ? '#F25D5D' : '#F2F4F2',
+              fontSize: '9.5px',
+              fontWeight: 600,
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Radio size={11} />
+            <span>DRONE-3 SIGNAL LOSS</span>
+          </button>
+
+          <button
+            onClick={() => {
+              handleRouteBlocked();
+              onItemClick?.();
+            }}
+            style={{
+              padding: '6px 8px',
+              background: routeBlocked ? 'rgba(240, 174, 99, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+              border: routeBlocked ? '1px solid #F0AE63' : '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '4px',
+              color: routeBlocked ? '#F0AE63' : '#F2F4F2',
+              fontSize: '9.5px',
+              fontWeight: 600,
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Slash size={11} />
+            <span>ROUTE BLOCKED</span>
+          </button>
+
+          <button
+            onClick={() => {
+              handleGroundRobotFailure();
+              onItemClick?.();
+            }}
+            style={{
+              padding: '6px 8px',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '4px',
+              color: '#F2F4F2',
+              fontSize: '9.5px',
+              fontWeight: 600,
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <AlertTriangle size={11} />
+            <span>GROUND ROBOT FAILURE</span>
+          </button>
+
+          <button
+            onClick={() => {
+              handleResetScenario();
+              onItemClick?.();
+            }}
+            style={{
+              padding: '6px 8px',
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '4px',
+              color: '#A7ADAB',
+              fontSize: '9.5px',
+              fontWeight: 600,
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginTop: '2px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <RefreshCw size={11} />
+            <span>RESET SCENARIO</span>
+          </button>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 'auto', padding: '12px 6px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+        <div style={{ fontSize: '10px', color: '#68706D', fontFamily: '"JetBrains Mono", monospace' }}>
+          AUTONOMOUS MESH
+        </div>
+        <div style={{ fontSize: '11px', color: '#78D6A3', marginTop: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
+          {d3Offline ? 'DEGRADED (3/4)' : 'FULL SYNC (4/4)'}
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div
       style={{
@@ -887,17 +1120,41 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* 1. Header Topbar per Spec Section 19 */}
       <header
         style={{
-          height: '56px',
+          minHeight: '56px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 20px',
+          padding: isMobile ? '8px 12px' : '0 20px',
           background: '#080A0B',
           zIndex: 40,
+          flexWrap: 'wrap',
+          gap: '8px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '20px' }}>
+          {!isDesktop && (
+            <button
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              aria-label="Toggle Mission Menu"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '4px',
+                color: '#F2F4F2',
+                padding: '6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '36px',
+                minHeight: '36px',
+              }}
+            >
+              {mobileSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          )}
+
           {/* Logo Mark */}
           <div
             onClick={onExitToLanding}
@@ -935,9 +1192,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '11px',
+                flexWrap: 'wrap',
               }}
             >
               <span style={{ color: '#F2F4F2', fontWeight: 700, fontSize: '12px', letterSpacing: '0.04em' }}>
@@ -959,17 +1217,23 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               </span>
               <span style={{ color: '#68706D' }}>•</span>
               <span style={{ color: '#A7ADAB', fontSize: '11px' }}>T+ {formatTimer(timeSeconds)}</span>
-              <span style={{ color: '#68706D' }}>•</span>
-              <span style={{ color: '#A7ADAB', fontSize: '11px' }}>4 AGENTS</span>
+              {!isMobile && (
+                <>
+                  <span style={{ color: '#68706D' }}>•</span>
+                  <span style={{ color: '#A7ADAB', fontSize: '11px' }}>4 AGENTS</span>
+                </>
+              )}
             </div>
-            <div style={{ fontSize: '11px', color: '#8D9693', fontFamily: '"Inter", sans-serif', marginTop: '1px' }}>
-              Searching the affected area and rescuing survivors.
-            </div>
+            {!isMobile && (
+              <div style={{ fontSize: '11px', color: '#8D9693', fontFamily: '"Inter", sans-serif', marginTop: '1px' }}>
+                Searching the affected area and rescuing survivors.
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right Header Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '12px', flexWrap: 'wrap' }}>
           {/* Audio toggle */}
           <button
             onClick={handleToggleAudio}
@@ -1000,7 +1264,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 border: '1px solid rgba(255, 255, 255, 0.28)',
                 borderRadius: '4px',
                 color: '#F2F4F2',
-                padding: '6px 12px',
+                padding: '6px 10px',
                 fontSize: '11px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontWeight: 600,
@@ -1011,7 +1275,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               }}
             >
               <Zap size={12} color="#F0AE63" />
-              <span>SIMULATE EVENT</span>
+              <span>{isMobile ? 'SIMULATE' : 'SIMULATE EVENT'}</span>
             </button>
 
             {/* Simulation Options Dropdown */}
@@ -1099,7 +1363,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             )}
           </div>
 
-          {/* Ask MissionMind AI Chat Trigger Button (Spec §4) */}
+          {/* Ask MissionMind AI Chat Trigger Button (Spec §4 & §52) */}
           <button
             onClick={() => {
               playUiTick();
@@ -1111,7 +1375,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               border: isChatOpen ? '1px solid #78D6A3' : '1px solid rgba(255, 255, 255, 0.28)',
               borderRadius: '4px',
               color: isChatOpen ? '#78D6A3' : '#F2F4F2',
-              padding: '6px 12px',
+              padding: '6px 10px',
               fontSize: '11px',
               fontWeight: 600,
               fontFamily: '"JetBrains Mono", monospace',
@@ -1123,7 +1387,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             }}
           >
             <Sparkles size={12} color={isChatOpen ? '#78D6A3' : '#F0AE63'} />
-            <span>Ask MissionMind</span>
+            <span>{isMobile ? 'Ask AI' : 'Ask MissionMind'}</span>
           </button>
 
           {/* Recovery Stage button */}
@@ -1138,17 +1402,17 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 color: '#F2F4F2',
                 border: '1px solid rgba(255, 255, 255, 0.28)',
                 borderRadius: '4px',
-                padding: '6px 12px',
-                fontSize: '11px',
+                padding: '6px 10px',
+                fontSize: '10.5px',
                 fontWeight: 600,
                 fontFamily: '"JetBrains Mono", monospace',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '4px',
               }}
             >
-              <span>Recovery Stage →</span>
+              <span>{isMobile ? 'Recovery →' : 'Recovery Stage →'}</span>
             </button>
           )}
 
@@ -1163,244 +1427,121 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               color: '#050607',
               border: 'none',
               borderRadius: '4px',
-              padding: '6px 12px',
-              fontSize: '11px',
+              padding: '6px 10px',
+              fontSize: '10.5px',
               fontWeight: 600,
               fontFamily: '"JetBrains Mono", monospace',
               cursor: 'pointer',
             }}
           >
-            Complete Mission →
+            {isMobile ? 'Complete →' : 'Complete Mission →'}
           </button>
         </div>
       </header>
 
       {/* 2. Main Workspace Layout */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left Sidebar */}
-        <aside
-          style={{
-            width: '210px',
-            borderRight: '1px solid rgba(255, 255, 255, 0.12)',
-            background: '#080A0B',
-            padding: '14px 10px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            flexShrink: 0,
-            overflowY: 'auto',
-          }}
-        >
-          {navItems.map((item) => {
-            const isActive = activeTab === item.label;
-            return (
-              <button
-                key={item.label}
-                onClick={() => {
-                  playUiTick();
-                  setActiveTab(item.label);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '10px',
-                  padding: '8px 10px',
-                  borderRadius: '4px',
-                  border: 'none',
-                  background: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
-                  color: isActive ? '#F2F4F2' : '#68706D',
-                  fontSize: '11px',
-                  fontWeight: isActive ? 500 : 400,
-                  fontFamily: '"Inter", sans-serif',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  borderLeft: isActive ? '2px solid #78D6A3' : '2px solid transparent',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div style={{ marginTop: '2px', color: isActive ? '#78D6A3' : '#68706D' }}>
-                  {item.icon}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ color: isActive ? '#F2F4F2' : '#A7ADAB', fontWeight: 600 }}>{item.label}</span>
-                  <span style={{ fontSize: '9.5px', color: '#68706D', marginTop: '1px', lineHeight: 1.25 }}>
-                    {item.subtitle}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-
-          {/* DEMO / SIMULATION CONTROLS */}
-          <div
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: isDesktop ? 'row' : 'column',
+          overflow: isDesktop ? 'hidden' : 'auto',
+        }}
+      >
+        {/* Left Sidebar on Desktop */}
+        {isDesktop && (
+          <aside
             style={{
-              marginTop: '12px',
-              padding: '10px 8px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '6px',
-              fontFamily: '"JetBrains Mono", monospace',
+              width: '210px',
+              borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+              background: '#080A0B',
+              padding: '14px 10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              flexShrink: 0,
+              overflowY: 'auto',
             }}
           >
-            <div
+            {renderSidebarNav()}
+          </aside>
+        )}
+
+        {/* Mobile Left Sidebar Drawer */}
+        {!isDesktop && mobileSidebarOpen && (
+          <div
+            onClick={() => setMobileSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 100,
+            }}
+          >
+            <aside
+              onClick={(e) => e.stopPropagation()}
               style={{
-                fontSize: '10px',
-                color: '#A7ADAB',
-                fontWeight: 600,
-                letterSpacing: '0.08em',
-                marginBottom: '8px',
+                width: 'min(300px, 85vw)',
+                height: '100%',
+                borderRight: '1px solid rgba(255, 255, 255, 0.15)',
+                background: '#080A0B',
+                padding: '16px 12px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
+                flexDirection: 'column',
+                gap: '8px',
+                overflowY: 'auto',
               }}
             >
-              <Zap size={11} color="#F0AE63" />
-              <span>DEMO CONTROLS</span>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <button
-                onClick={handleSurvivorDetected}
-                style={{
-                  padding: '6px 8px',
-                  background: showSurvivor ? 'rgba(240, 174, 99, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                  border: showSurvivor ? '1px solid #F0AE63' : '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '4px',
-                  color: showSurvivor ? '#F0AE63' : '#F2F4F2',
-                  fontSize: '9.5px',
-                  fontWeight: 600,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Target size={11} />
-                <span>SURVIVOR DETECTED</span>
-              </button>
-
-              <button
-                onClick={handleDrone3SignalLoss}
-                style={{
-                  padding: '6px 8px',
-                  background: d3Offline ? 'rgba(242, 93, 93, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                  border: d3Offline ? '1px solid #F25D5D' : '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '4px',
-                  color: d3Offline ? '#F25D5D' : '#F2F4F2',
-                  fontSize: '9.5px',
-                  fontWeight: 600,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Radio size={11} />
-                <span>DRONE-3 SIGNAL LOSS</span>
-              </button>
-
-              <button
-                onClick={handleRouteBlocked}
-                style={{
-                  padding: '6px 8px',
-                  background: routeBlocked ? 'rgba(240, 174, 99, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                  border: routeBlocked ? '1px solid #F0AE63' : '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '4px',
-                  color: routeBlocked ? '#F0AE63' : '#F2F4F2',
-                  fontSize: '9.5px',
-                  fontWeight: 600,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Slash size={11} />
-                <span>ROUTE BLOCKED</span>
-              </button>
-
-              <button
-                onClick={handleGroundRobotFailure}
-                style={{
-                  padding: '6px 8px',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '4px',
-                  color: '#F2F4F2',
-                  fontSize: '9.5px',
-                  fontWeight: 600,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <AlertTriangle size={11} />
-                <span>GROUND ROBOT FAILURE</span>
-              </button>
-
-              <button
-                onClick={handleResetScenario}
-                style={{
-                  padding: '6px 8px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '4px',
-                  color: '#A7ADAB',
-                  fontSize: '9.5px',
-                  fontWeight: 600,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  marginTop: '2px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <RefreshCw size={11} />
-                <span>RESET SCENARIO</span>
-              </button>
-            </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#78D6A3', fontFamily: '"JetBrains Mono", monospace' }}>
+                  MISSION MENU
+                </span>
+                <button
+                  onClick={() => setMobileSidebarOpen(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#A7ADAB', cursor: 'pointer', padding: '6px' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              {renderSidebarNav(() => setMobileSidebarOpen(false))}
+            </aside>
           </div>
-
-          <div style={{ marginTop: 'auto', padding: '12px 6px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-            <div style={{ fontSize: '10px', color: '#68706D', fontFamily: '"JetBrains Mono", monospace' }}>
-              AUTONOMOUS MESH
-            </div>
-            <div style={{ fontSize: '11px', color: '#78D6A3', marginTop: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
-              {d3Offline ? 'DEGRADED (3/4)' : 'FULL SYNC (4/4)'}
-            </div>
-          </div>
-        </aside>
+        )}
 
         {/* Center Live Map Viewport */}
-        <main style={{ flex: 1, padding: '14px', position: 'relative', overflow: 'hidden' }}>
+        <main
+          style={{
+            flex: isDesktop ? 1 : 'none',
+            height: isDesktop ? '100%' : (isMobile ? 'clamp(360px, 50vh, 460px)' : 'clamp(420px, 55vh, 520px)'),
+            minHeight: '360px',
+            padding: isMobile ? '8px' : '14px',
+            position: 'relative',
+            overflow: 'hidden',
+            borderBottom: isDesktop ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
+            flexShrink: 0,
+          }}
+        >
           {/* Mission Complete Overlay Banner when all tasks are finished */}
           {tasks.every((t) => t.status === 'COMPLETED') && (
             <div
               style={{
                 position: 'absolute',
-                top: '24px',
+                top: '16px',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 zIndex: 60,
+                width: 'min(500px, calc(100% - 24px))',
                 background: 'rgba(8, 10, 11, 0.95)',
                 border: '1px solid #78D6A3',
                 boxShadow: '0 8px 32px rgba(120, 214, 163, 0.25)',
                 borderRadius: '6px',
-                padding: '12px 20px',
+                padding: '12px 18px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '20px',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
                 fontFamily: '"JetBrains Mono", monospace',
                 backdropFilter: 'blur(10px)',
               }}
@@ -1460,9 +1601,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div
               style={{
                 position: 'absolute',
-                top: '20px',
-                right: '20px',
-                width: '360px',
+                top: '16px',
+                right: isMobile ? '12px' : '20px',
+                left: isMobile ? '12px' : 'auto',
+                maxWidth: 'min(360px, calc(100% - 24px))',
                 background: 'rgba(8, 10, 11, 0.95)',
                 border: `1px solid ${
                   selectedEvent.level === 'critical' ? '#F25D5D' : selectedEvent.level === 'warning' ? '#F0AE63' : '#78D6A3'
@@ -1521,8 +1663,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div
               style={{
                 position: 'absolute',
-                top: '20px',
-                left: '20px',
+                top: '16px',
+                left: '12px',
+                maxWidth: 'min(360px, calc(100% - 24px))',
                 background: 'rgba(8, 10, 11, 0.95)',
                 border: '1px solid #78D6A3',
                 borderRadius: '6px',
@@ -1550,9 +1693,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div
               style={{
                 position: 'absolute',
-                bottom: '24px',
-                left: '24px',
-                width: '380px',
+                bottom: '16px',
+                left: '12px',
+                maxWidth: 'min(380px, calc(100% - 24px))',
+                width: '100%',
                 background: 'rgba(8, 10, 11, 0.95)',
                 border: '1px solid rgba(120, 214, 163, 0.4)',
                 borderRadius: '6px',
@@ -1620,9 +1764,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <div
               style={{
                 position: 'absolute',
-                bottom: '24px',
-                left: '24px',
-                width: '420px',
+                bottom: '16px',
+                left: '12px',
+                maxWidth: 'min(420px, calc(100% - 24px))',
+                width: '100%',
                 background: 'rgba(8, 10, 11, 0.96)',
                 border: '1px solid rgba(242, 93, 93, 0.5)',
                 borderRadius: '6px',
@@ -1722,17 +1867,28 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* Right Side Panels: Status, Progress, Feed */}
         <aside
           style={{
-            width: '350px',
-            borderLeft: '1px solid rgba(255, 255, 255, 0.12)',
+            width: isDesktop ? '350px' : '100%',
+            borderLeft: isDesktop ? '1px solid rgba(255, 255, 255, 0.12)' : 'none',
             background: '#080A0B',
-            padding: '14px',
+            padding: isMobile ? '16px 12px' : '14px',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
             flexShrink: 0,
-            overflowY: 'auto',
+            overflowY: isDesktop ? 'auto' : 'visible',
           }}
         >
+          {/* On mobile, per Spec §27: Mission Progress first */}
+          {!isDesktop && (
+            <MissionProgressPanel
+              areaScanned={areaScanned}
+              survivorsFound={survivorsFound}
+              totalSurvivors={3}
+              timeElapsed={formatTimer(timeSeconds)}
+              confidence={confidence}
+            />
+          )}
+
           {/* Agent Status */}
           <AgentStatusPanel
             agents={agents}
@@ -1751,14 +1907,16 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             onOpenLogModal={() => setShowReasoningModal(true)}
           />
 
-          {/* Mission Progress */}
-          <MissionProgressPanel
-            areaScanned={areaScanned}
-            survivorsFound={survivorsFound}
-            totalSurvivors={3}
-            timeElapsed={formatTimer(timeSeconds)}
-            confidence={confidence}
-          />
+          {/* Mission Progress on Desktop */}
+          {isDesktop && (
+            <MissionProgressPanel
+              areaScanned={areaScanned}
+              survivorsFound={survivorsFound}
+              totalSurvivors={3}
+              timeElapsed={formatTimer(timeSeconds)}
+              confidence={confidence}
+            />
+          )}
         </aside>
       </div>
 

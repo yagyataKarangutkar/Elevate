@@ -289,7 +289,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             borderRadius: '6px',
             padding: '18px 24px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
             gap: '16px',
             alignItems: 'center',
           }}
@@ -408,7 +408,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
               gap: '14px',
             }}
           >
@@ -540,9 +540,10 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               background: '#080A0B',
               border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: '6px',
-              overflow: 'hidden',
+              overflowX: 'auto',
             }}
           >
+            <div style={{ minWidth: '700px' }}>
             {/* Table Header */}
             <div
               style={{
@@ -699,6 +700,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
                   </div>
                 );
               })}
+            </div>
             </div>
           </div>
         </section>
