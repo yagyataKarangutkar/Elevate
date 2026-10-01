@@ -247,10 +247,10 @@ export const BlueprintSection: React.FC = () => {
         }}
       >
         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#78D6A3' }} />
-        <span>03. HARDWARE & SWARM BLUEPRINTS</span>
+        <span>03. FLEET CAPABILITIES & AGENT SPECIFICATIONS</span>
       </div>
 
-      {/* Header and intro */}
+      {/* Header and intro per Spec Section 11 & 38 */}
       <div
         style={{
           display: 'flex',
@@ -273,7 +273,7 @@ export const BlueprintSection: React.FC = () => {
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            Tactical Schematics & Heterogeneous Fleet Specs.
+            The Swarm Fleet: Built to search, adapt and rescue.
           </h2>
           <p
             style={{
@@ -285,8 +285,7 @@ export const BlueprintSection: React.FC = () => {
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            Inspect the physical architectures, avionics, sensor arrays, and encrypted mesh links powering
-            MissionMind’s coordinated aerial and ground robotics.
+            Inspect how each aerial and ground unit functions within MissionMind's autonomous missions, with full engineering details available on demand.
           </p>
         </div>
 
@@ -507,9 +506,9 @@ export const BlueprintSection: React.FC = () => {
             }}
           >
             {[
-              { id: 'specs', label: 'SPECIFICATIONS' },
+              { id: 'specs', label: 'TECHNICAL DETAILS' },
               { id: 'subsystems', label: 'SUBSYSTEMS' },
-              { id: 'telemetry', label: 'REAL-TIME METRICS' },
+              { id: 'telemetry', label: 'SWARM METRICS' },
             ].map((t) => {
               const isActive = activeTab === t.id;
               return (

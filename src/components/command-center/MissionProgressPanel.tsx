@@ -76,21 +76,21 @@ export const MissionProgressPanel: React.FC<MissionProgressPanelProps> = ({
           </span>
         </div>
 
-        {/* Confidence Meter */}
+        {/* Mission Status / Confidence Meter per Spec Section 21 */}
         <div style={{ marginTop: '4px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#A7ADAB', fontSize: '11px' }}>
               <ShieldCheck size={13} color={isConfidenceWarning ? '#F25D5D' : '#78D6A3'} />
-              <span>Autonomy Confidence</span>
+              <span>Mission Status</span>
             </div>
             <span
               style={{
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 600,
-                color: isConfidenceWarning ? '#F25D5D' : '#F2F4F2',
+                color: isConfidenceWarning ? '#F0AE63' : '#78D6A3',
               }}
             >
-              {confidence}%
+              {isConfidenceWarning ? 'Needs review (42%)' : `High confidence (${confidence}%)`}
             </span>
           </div>
           <div
@@ -106,8 +106,8 @@ export const MissionProgressPanel: React.FC<MissionProgressPanelProps> = ({
               style={{
                 height: '100%',
                 width: `${confidence}%`,
-                background: isConfidenceWarning ? '#F25D5D' : '#ffffff',
-                boxShadow: isConfidenceWarning ? '0 0 8px #F25D5D' : '0 0 6px rgba(255, 255, 255, 0.6)',
+                background: isConfidenceWarning ? '#F0AE63' : '#78D6A3',
+                boxShadow: isConfidenceWarning ? '0 0 8px #F0AE63' : '0 0 6px rgba(120, 214, 163, 0.6)',
                 transition: 'all 0.5s ease',
               }}
             />

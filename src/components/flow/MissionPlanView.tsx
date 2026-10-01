@@ -200,7 +200,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
           gap: '28px',
         }}
       >
-        {/* Header Block with Mission Feasible Status */}
+        {/* Header Block per Spec Section 15 & 16 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div
@@ -216,7 +216,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               }}
             >
               <ShieldCheck size={14} color="#78D6A3" />
-              <span>STAGE 04 · AUTONOMOUS SWARM PLAN COMPILED</span>
+              <span>STAGE 04 · PLAN READY</span>
             </div>
             <h1
               style={{
@@ -229,7 +229,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
                 color: '#F2F4F2',
               }}
             >
-              Mission Plan: Tactical Task Allocation
+              Here is what MissionMind plans to do.
             </h1>
             <p
               style={{
@@ -238,44 +238,44 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
                 maxWidth: '640px',
               }}
             >
-              The autonomous planning engine has validated operational constraints and assigned 9 coordinated swarm tasks based on agent sensor capabilities.
+              All four robots have a suitable task and a reachable route. The mission can be completed as planned.
             </p>
           </div>
 
-          {/* Feasible Status Stamp */}
+          {/* Feasible Status Stamp per Spec Section 16 */}
           <div
             style={{
               background: 'rgba(120, 214, 163, 0.1)',
               border: '1px solid rgba(120, 214, 163, 0.35)',
               borderRadius: '6px',
-              padding: '12px 18px',
+              padding: '14px 18px',
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
             }}
           >
-            <CheckCircle2 size={20} color="#78D6A3" />
+            <CheckCircle2 size={22} color="#78D6A3" />
             <div>
+              <div
+                style={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#78D6A3',
+                }}
+              >
+                Mission can be completed
+              </div>
               <div
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
                   fontSize: '10px',
                   color: '#A7ADAB',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                PLAN STATUS
-              </div>
-              <div
-                style={{
-                  fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  color: '#78D6A3',
                   letterSpacing: '0.04em',
+                  marginTop: '2px',
                 }}
               >
-                FEASIBLE
+                Feasibility: Confirmed · All routes reachable
               </div>
             </div>
           </div>
@@ -794,7 +794,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             <span>Modify Mission Input</span>
           </button>
 
-          {/* Primary CTA: ENTER COMMAND CENTER */}
+          {/* Primary CTA: START MISSION per Spec Section 15 & 46 */}
           <button
             type="button"
             onClick={() => {
@@ -825,7 +825,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <span>ENTER COMMAND CENTER</span>
+            <span>Start Mission</span>
             <ArrowRight size={14} />
           </button>
         </div>

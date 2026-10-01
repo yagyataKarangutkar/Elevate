@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PublicNavbar } from './components/layout/PublicNavbar';
 import { LandingHero } from './components/landing/LandingHero';
+import { HowItWorksSection } from './components/landing/HowItWorksSection';
 import { AboutFeaturesSection } from './components/landing/AboutFeaturesSection';
 import { BlueprintSection } from './components/blueprints/BlueprintSection';
 import { MissionCreationSection } from './components/mission/MissionCreationSection';
@@ -82,7 +83,15 @@ export function App() {
                   setCurrentView('mission_input');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                onExplorePlan={() => handleNavigateSection('mission-creation')}
+                onExplorePlan={() => handleNavigateSection('how-it-works')}
+              />
+            </div>
+            <div id="how-it-works">
+              <HowItWorksSection
+                onTryMission={() => {
+                  setCurrentView('mission_input');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
             </div>
             <div id="about">

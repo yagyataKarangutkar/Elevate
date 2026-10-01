@@ -21,32 +21,32 @@ const PLANNING_SEQUENCE: StepItem[] = [
   {
     id: 'step-1',
     num: 1,
-    label: 'READING MISSION',
-    detail: 'Parsing high-level operational objective and target disaster parameters.',
+    label: 'UNDERSTANDING YOUR GOAL',
+    detail: 'Reading your mission goal and analyzing disaster parameters.',
   },
   {
     id: 'step-2',
     num: 2,
-    label: 'DECOMPOSING TASKS',
-    detail: 'Generating discrete spatial sweep, triage, and extraction subtasks across 3 zones.',
+    label: 'BREAKING IT INTO TASKS',
+    detail: 'Splitting your goal into search sectors, communication links, and rescue tasks.',
   },
   {
     id: 'step-3',
     num: 3,
-    label: 'MATCHING CAPABILITIES',
-    detail: 'Allocating aerial FLIR, optical LiDAR, RF mesh bridge, and ground rescue payloads.',
+    label: 'CHOOSING THE RIGHT ROBOTS',
+    detail: 'Matching drone sensors and GroundBot rescue capabilities to each task.',
   },
   {
     id: 'step-4',
     num: 4,
-    label: 'CHECKING CONSTRAINTS',
-    detail: 'Verifying RF line-of-sight, battery envelopes, terrain topography, and loiter limits.',
+    label: 'PLANNING THE SAFEST ROUTES',
+    detail: 'Checking flight paths, signal coverage, and ground traversability.',
   },
   {
     id: 'step-5',
     num: 5,
-    label: 'VALIDATING PLAN',
-    detail: 'Simulating collision-free flight corridors and contingency decision thresholds.',
+    label: 'PLAN READY',
+    detail: 'All tasks assigned. Mission can be completed safely.',
   },
 ];
 
@@ -164,12 +164,12 @@ export const PlanGenerationView: React.FC<PlanGenerationViewProps> = ({
               {isFeasible ? (
                 <>
                   <ShieldCheck size={14} color="#78D6A3" />
-                  <span style={{ fontWeight: 600 }}>MISSION FEASIBLE</span>
+                  <span style={{ fontWeight: 600 }}>PLAN READY · MISSION CAN BE COMPLETED</span>
                 </>
               ) : (
                 <>
                   <Loader2 size={13} className="spin" color="#78D6A3" />
-                  <span>SYNTHESIZING MULTI-AGENT SWARM PLAN</span>
+                  <span>BUILDING YOUR MISSION PLAN</span>
                 </>
               )}
             </div>

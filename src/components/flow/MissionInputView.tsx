@@ -22,43 +22,42 @@ interface MissionInputViewProps {
 export const DEMO_AGENTS: MissionAgentConfig[] = [
   {
     id: 'D1',
-    name: 'DRONE-01',
+    name: 'DRONE 01',
     type: 'Drone',
-    capabilities: ['Thermal imaging', 'Aerial search', 'Mapping'],
+    capabilities: ['Thermal search', 'Aerial mapping', 'Hazard detection'],
     battery: 82,
     signal: 96,
   },
   {
     id: 'D2',
-    name: 'DRONE-02',
+    name: 'DRONE 02',
     type: 'Drone',
-    capabilities: ['Optical camera', 'Aerial search', 'Mapping'],
+    capabilities: ['Optical camera', 'Aerial sweep', 'Corridor survey'],
     battery: 74,
     signal: 94,
   },
   {
     id: 'D3',
-    name: 'DRONE-03',
+    name: 'DRONE 03',
     type: 'Drone',
-    capabilities: ['Communication relay', 'Mapping', 'Visual search'],
+    capabilities: ['Relay bridge', 'Search support', 'Mesh link'],
     battery: 61,
     signal: 91,
   },
   {
     id: 'G1',
-    name: 'GROUND-01',
+    name: 'GROUNDBOT 01',
     type: 'Ground',
-    capabilities: ['Ground movement', 'Aid payload', 'Survivor rescue'],
+    capabilities: ['Rescue support', 'Aid payload', 'Ground extraction'],
     battery: 91,
     signal: 98,
   },
 ];
 
 const PRESETS = [
-  'Search the earthquake zone and rescue survivors.',
-  'Earthquake Sector A structural collapse inspection.',
-  'Hazardous chemical spill perimeter containment.',
-  'Post-disaster corridor mapping and survivor triage.',
+  'Find survivors in the affected area',
+  'Search Sector A and Sector B',
+  'Find survivors and bring help to Sector C',
 ];
 
 export const MissionInputView: React.FC<MissionInputViewProps> = ({
@@ -150,7 +149,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
           gap: '28px',
         }}
       >
-        {/* Header Eyebrow & Title */}
+        {/* Header Eyebrow & Title per Spec Section 13 */}
         <div>
           <div
             style={{
@@ -173,7 +172,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
                 display: 'inline-block',
               }}
             />
-            <span>MISSION CONFIGURATION · STAGE 02</span>
+            <span>STAGE 02 · MISSION GOAL</span>
           </div>
 
           <h1
@@ -187,7 +186,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               color: '#F2F4F2',
             }}
           >
-            Define Mission Objective
+            What should the swarm do?
           </h1>
 
           <p
@@ -198,7 +197,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               lineHeight: 1.6,
             }}
           >
-            Specify the operational target directive and allocate autonomous swarm units. MissionMind compiles the flight corridors and task distribution automatically.
+            Give MissionMind a goal in one sentence.
           </p>
         </div>
 
@@ -225,7 +224,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
                 fontWeight: 500,
               }}
             >
-              MISSION OBJECTIVE DIRECTIVE
+              MISSION GOAL
             </label>
             <span
               style={{
@@ -234,7 +233,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
                 color: '#68706D',
               }}
             >
-              NATURAL LANGUAGE SPECIFICATION
+              PLAIN ENGLISH DIRECTIVE
             </span>
           </div>
 
@@ -650,7 +649,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
             ← Return to Landing
           </button>
 
-          {/* GENERATE PLAN CTA button */}
+          {/* CREATE PLAN CTA button per Spec Section 13 & 46 */}
           <button
             type="button"
             onClick={handleGenerate}
@@ -678,7 +677,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <span>GENERATE PLAN</span>
+            <span>Create Plan</span>
             <ArrowRight size={14} />
           </button>
         </div>

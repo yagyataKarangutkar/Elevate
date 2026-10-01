@@ -6,24 +6,28 @@ import { playUiTick } from '../../utils/audio';
 export const AboutFeaturesSection: React.FC = () => {
   const capabilities = [
     {
-      icon: <Network size={16} color="#A7ADAB" />,
-      title: 'Multi-Agent Coordination',
-      desc: 'Drones, ground robots and relay units work together as a single team.',
+      icon: <Compass size={16} color="#78D6A3" />,
+      title: 'Give one goal',
+      desc: 'Tell MissionMind what you want to achieve. You do not need to control every robot yourself.',
+      techLabel: 'Mission-driven control',
     },
     {
-      icon: <ShieldCheck size={16} color="#A7ADAB" />,
-      title: 'Confidence-Based Autonomy',
-      desc: 'Acts independently when confident; escalates to a human when needed.',
+      icon: <Network size={16} color="#78D6A3" />,
+      title: 'Let the AI make the plan',
+      desc: 'MissionMind breaks your goal into smaller tasks and gives each task to the robot that fits it best.',
+      techLabel: 'Task allocation',
     },
     {
-      icon: <GitFork size={16} color="#A7ADAB" />,
-      title: 'Adaptive Planning',
-      desc: 'Replans in real-time when the environment changes or agents fail.',
+      icon: <GitFork size={16} color="#78D6A3" />,
+      title: 'Watch the swarm adapt',
+      desc: 'When a route is blocked, a robot fails or communication drops, MissionMind changes the plan instead of starting over.',
+      techLabel: 'Adaptive replanning',
     },
     {
-      icon: <Compass size={16} color="#A7ADAB" />,
-      title: 'Mission-Driven Intelligence',
-      desc: 'Focuses on outcomes, not individual agent control.',
+      icon: <ShieldCheck size={16} color="#78D6A3" />,
+      title: 'Step in only when needed',
+      desc: 'MissionMind works on its own when it is confident. If the situation becomes uncertain, it asks you before continuing.',
+      techLabel: 'Human-in-the-loop autonomy',
     },
   ];
 
@@ -47,7 +51,7 @@ export const AboutFeaturesSection: React.FC = () => {
           marginBottom: '16px',
         }}
       >
-        02. ABOUT
+        02. ABOUT MISSIONMIND
       </div>
 
       <div
@@ -71,7 +75,7 @@ export const AboutFeaturesSection: React.FC = () => {
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            Built for real-world complexity.
+            One goal. Four robots. One coordinated mission.
           </h2>
 
           <p
@@ -84,10 +88,10 @@ export const AboutFeaturesSection: React.FC = () => {
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            MissionMind combines AI planning, heterogeneous agents and adaptive replanning to keep your mission on track — even when the environment changes.
+            MissionMind turns a simple rescue objective into a coordinated plan, then keeps adapting when the situation changes.
           </p>
 
-          {/* 4 Feature Capability Cards */}
+          {/* 4 Feature Capability Cards per Spec Section 10 */}
           <div
             style={{
               display: 'grid',
@@ -106,6 +110,9 @@ export const AboutFeaturesSection: React.FC = () => {
                   padding: '18px',
                   transition: 'all 0.25s ease',
                   cursor: 'default',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
@@ -116,27 +123,41 @@ export const AboutFeaturesSection: React.FC = () => {
                   e.currentTarget.style.background = '#080A0B';
                 }}
               >
-                <div style={{ marginBottom: '10px' }}>{cap.icon}</div>
-                <div
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: '#F2F4F2',
-                    marginBottom: '6px',
-                    fontFamily: '"Inter", sans-serif',
-                  }}
-                >
-                  {cap.title}
-                </div>
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: '#8D9693',
-                    lineHeight: 1.5,
-                    fontFamily: '"Inter", sans-serif',
-                  }}
-                >
-                  {cap.desc}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div>{cap.icon}</div>
+                    <span
+                      style={{
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontSize: '9px',
+                        color: '#68706D',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {cap.techLabel}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#F2F4F2',
+                      marginBottom: '6px',
+                      fontFamily: '"Inter", sans-serif',
+                    }}
+                  >
+                    {cap.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#8D9693',
+                      lineHeight: 1.5,
+                      fontFamily: '"Inter", sans-serif',
+                    }}
+                  >
+                    {cap.desc}
+                  </div>
                 </div>
               </div>
             ))}

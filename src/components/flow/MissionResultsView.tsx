@@ -8,7 +8,6 @@ import {
   Activity,
   Layers,
   Sparkles,
-  Info,
 } from 'lucide-react';
 import { playUiTick, playSuccessChirp } from '../../utils/audio';
 import { ComparisonEngine, type ComparisonStrategyResult } from '../../engine';
@@ -104,7 +103,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
                 fontFamily: '"JetBrains Mono", monospace',
               }}
             >
-              Multi-Strategy Mission Comparison
+              Did adaptation help?
             </h1>
             <p
               style={{
@@ -115,7 +114,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
                 lineHeight: 1.5,
               }}
             >
-              Evaluating three autonomy strategies under the identical multi-failure earthquake search and rescue scenario.
+              Same mission. Same failures. Different response.
             </p>
           </div>
 
@@ -180,9 +179,12 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
                 ZERO ADAPTATION
               </span>
             </div>
-            <p style={{ fontSize: '11.5px', color: '#68706D', lineHeight: 1.5, margin: 0, fontFamily: '"Inter", sans-serif' }}>
-              The original plan remains unchanged. Tasks affected by failures fail or remain unassigned.
+            <p style={{ fontSize: '11.5px', color: '#A7ADAB', lineHeight: 1.5, margin: '0 0 6px', fontFamily: '"Inter", sans-serif' }}>
+              When Drone 03 failed, its area went unsearched. When GroundBot was blocked, the rescue was delayed indefinitely.
             </p>
+            <div style={{ fontSize: '10.5px', color: '#F25D5D', fontWeight: 600, fontFamily: '"JetBrains Mono", monospace' }}>
+              Result: Mission failed · 1 survivor reached · 45 min
+            </div>
           </div>
 
           {/* 2. FULL RE-PLAN */}
@@ -208,9 +210,12 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
                 GLOBAL REBUILD
               </span>
             </div>
-            <p style={{ fontSize: '11.5px', color: '#68706D', lineHeight: 1.5, margin: 0, fontFamily: '"Inter", sans-serif' }}>
-              When a failure happens, discards the current plan, generates a completely new plan, and reassigns tasks globally.
+            <p style={{ fontSize: '11.5px', color: '#A7ADAB', lineHeight: 1.5, margin: '0 0 6px', fontFamily: '"Inter", sans-serif' }}>
+              When a failure happens, discards everything and rebuilds the plan. Disrupts all robots and delays the rescue.
             </p>
+            <div style={{ fontSize: '10.5px', color: '#F0AE63', fontWeight: 600, fontFamily: '"JetBrains Mono", monospace' }}>
+              Result: Heavy churn · 17 tasks moved · Timeout risk
+            </div>
           </div>
 
           {/* 3. MISSIONMIND LIFELINE */}
@@ -235,12 +240,15 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
                 <span>3. MISSIONMIND</span>
               </div>
               <span style={{ fontSize: '9px', padding: '2px 6px', background: 'rgba(120, 214, 163, 0.15)', color: '#78D6A3', borderRadius: '3px', fontFamily: '"JetBrains Mono", monospace' }}>
-                MINIMUM INTERVENTION
+                ADAPTIVE RECOVERY
               </span>
             </div>
-            <p style={{ fontSize: '11.5px', color: '#A7ADAB', lineHeight: 1.5, margin: 0, fontFamily: '"Inter", sans-serif' }}>
-              Identifies affected tasks, selects the smallest feasible intervention along the recovery ladder, and preserves unaffected tasks.
+            <p style={{ fontSize: '11.5px', color: '#A7ADAB', lineHeight: 1.5, margin: '0 0 6px', fontFamily: '"Inter", sans-serif' }}>
+              When Drone 03 failed, Drone 02 expanded its route. When GroundBot was blocked, MissionMind found an alternate route.
             </p>
+            <div style={{ fontSize: '10.5px', color: '#78D6A3', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>
+              Result: Mission completed · 3 survivors reached · 14 min
+            </div>
           </div>
         </div>
 
@@ -516,42 +524,43 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
           </table>
         </div>
 
-        {/* Concise Explanation below Table (As Requested) */}
+        {/* Spec Section 36 Verbatim Key Takeaway */}
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(120, 214, 163, 0.08)',
+            border: '1px solid rgba(120, 214, 163, 0.35)',
             borderRadius: '6px',
-            padding: '20px 24px',
+            padding: '22px 26px',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Info size={15} color="#78D6A3" />
+            <Sparkles size={17} color="#78D6A3" />
             <span
               style={{
                 fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '12px',
+                fontSize: '14px',
                 fontWeight: 700,
-                color: '#F2F4F2',
-                letterSpacing: '0.04em',
+                color: '#78D6A3',
+                letterSpacing: '0.02em',
               }}
             >
-              MissionMind focuses on minimum verified intervention rather than rebuilding the entire mission after every failure.
+              Without adaptation, a plan is only good until the first failure.
             </span>
           </div>
           <p
             style={{
-              fontSize: '12.5px',
-              color: '#A7ADAB',
+              fontSize: '13px',
+              color: '#F2F4F2',
               lineHeight: 1.6,
               margin: 0,
               fontFamily: '"Inter", sans-serif',
+              fontWeight: 500,
             }}
           >
-            Under identical failure conditions, static planning leaves critical tasks stranded, while global replanning introduces severe task churn (17 tasks moved), repeatedly pauses swarm operations, and overruns the operational deadline. By verifying local constraints and escalating through a structured recovery ladder, MissionMind stabilizes the swarm, minimizes operator burden (1 single command), and preserves deadline feasibility.
+            MissionMind keeps the swarm working toward the goal, no matter what changes. When disruptions occur, it makes the smallest safe change rather than leaving tasks stranded or throwing the entire swarm into chaos.
           </p>
         </div>
 

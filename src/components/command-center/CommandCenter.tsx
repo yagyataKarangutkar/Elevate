@@ -26,7 +26,10 @@ import {
   Slash,
   CheckCircle2,
   X,
+  Sparkles,
 } from 'lucide-react';
+import { MissionAssistantDrawer } from '../ai-assistant';
+import type { MissionAssistantContext } from '../../types/assistant';
 import {
   playUiTick,
   playAlertAlarm,
@@ -147,6 +150,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   const [showSimMenu, setShowSimMenu] = useState<boolean>(false);
   const [showReasoningModal, setShowReasoningModal] = useState<boolean>(false);
   const [selectedAgentId, setSelectedAgentId] = useState<AgentId | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<MissionEvent | null>(null);
 
   // Real Mission Simulation State
   const [tasks, setTasks] = useState<TaskItem[]>(INITIAL_DEMO_TASKS);
@@ -169,10 +173,36 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   const [lifelineProposal, setLifelineProposal] = useState<LifelineInterventionProposal | null>(null);
   const [showLifelineModal, setShowLifelineModal] = useState<boolean>(false);
   const [approvalRequired, setApprovalRequired] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   // Agents & Events
   const [agents, setAgents] = useState<Agent[]>(INITIAL_DEMO_AGENTS);
   const [events, setEvents] = useState<MissionEvent[]>(INITIAL_DEMO_EVENTS);
+
+  // Live Assistant Context derived from simulation state
+  const assistantContext: MissionAssistantContext = {
+    mission: {
+      name: 'Earthquake Search & Rescue',
+      objective: 'Searching the affected area and rescuing survivors.',
+      phase: activeTab.toLowerCase(),
+      status: missionStatus,
+      confidence,
+      survivorsFound,
+      areaScanned,
+      timeElapsedSeconds: timeSeconds,
+      tasksTotal: tasks.length,
+      tasksCompleted: tasks.filter((t) => t.status === 'COMPLETED').length,
+    },
+    agents,
+    events,
+    routeBlocked,
+    d3Offline,
+    d2RelayActive,
+    groundFailed,
+    approvalRequired,
+    replanApproved,
+    lifelineRecommendation: lifelineProposal ? 'Deploy GroundBot 02 reserve' : undefined,
+  };
 
   // Live Timer
   useEffect(() => {
@@ -664,6 +694,15 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     setAgents(INITIAL_DEMO_AGENTS);
     setEvents(INITIAL_DEMO_EVENTS);
     setTasks(INITIAL_DEMO_TASKS);
+    setSelectedEvent(null);
+  };
+
+  const handleSelectEvent = (evt: MissionEvent) => {
+    playUiTick();
+    setSelectedEvent(evt);
+    if (evt.agentId) {
+      setSelectedAgentId(evt.agentId);
+    }
   };
 
   /**
@@ -825,13 +864,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const navItems = [
-    { label: 'Overview', icon: <Layers size={14} /> },
-    { label: 'Mission Plan', icon: <FileText size={14} /> },
-    { label: 'Agents', icon: <Users size={14} /> },
-    { label: 'Map', icon: <Map size={14} /> },
-    { label: 'Events', icon: <Activity size={14} /> },
-    { label: 'Logs', icon: <Radio size={14} /> },
-    { label: 'Settings', icon: <Sliders size={14} /> },
+    { label: 'Overview', subtitle: 'See what is happening right now.', icon: <Layers size={14} /> },
+    { label: 'Mission Plan', subtitle: 'See what each robot is supposed to do.', icon: <FileText size={14} /> },
+    { label: 'Agents', subtitle: 'See the health and status of every robot.', icon: <Users size={14} /> },
+    { label: 'Map', subtitle: 'View real-time tactical positioning.', icon: <Map size={14} /> },
+    { label: 'Events', subtitle: 'See what changed during the mission.', icon: <Activity size={14} /> },
+    { label: 'Logs', subtitle: 'See the detailed system record.', icon: <Radio size={14} /> },
+    { label: 'Settings', subtitle: 'Configure simulation & alerts.', icon: <Sliders size={14} /> },
   ];
 
   return (
@@ -845,10 +884,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* 1. Header Topbar matching visual reference */}
+      {/* 1. Header Topbar per Spec Section 19 */}
       <header
         style={{
-          height: '48px',
+          height: '56px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
           display: 'flex',
           alignItems: 'center',
@@ -858,7 +897,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           zIndex: 40,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           {/* Logo Mark */}
           <div
             onClick={onExitToLanding}
@@ -888,88 +927,44 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <span>MissionMind</span>
           </div>
 
-          <div style={{ width: '1px', height: '16px', background: 'rgba(255, 255, 255, 0.15)' }} />
+          <div style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.12)' }} />
 
-          {/* MISSION STATUS */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              fontFamily: '"JetBrains Mono", monospace',
-              fontSize: '11px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#68706D', fontSize: '10px' }}>MISSION:</span>
-              <span style={{ color: '#F2F4F2', fontWeight: 600 }}>EARTHQUAKE RESCUE</span>
+          {/* Mission Title + Plain-English Story Sentence per Spec Section 19 */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '11px',
+              }}
+            >
+              <span style={{ color: '#F2F4F2', fontWeight: 700, fontSize: '12px', letterSpacing: '0.04em' }}>
+                EARTHQUAKE RESCUE
+              </span>
+              <span
+                style={{
+                  background: 'rgba(120, 214, 163, 0.12)',
+                  border: '1px solid rgba(120, 214, 163, 0.35)',
+                  color: '#78D6A3',
+                  padding: '1px 6px',
+                  borderRadius: '3px',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                ACTIVE
+              </span>
+              <span style={{ color: '#68706D' }}>•</span>
+              <span style={{ color: '#A7ADAB', fontSize: '11px' }}>T+ {formatTimer(timeSeconds)}</span>
+              <span style={{ color: '#68706D' }}>•</span>
+              <span style={{ color: '#A7ADAB', fontSize: '11px' }}>4 AGENTS</span>
             </div>
-
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#68706D', fontSize: '10px' }}>STATUS:</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background:
-                      missionStatus === 'BLOCKED'
-                        ? '#F25D5D'
-                        : missionStatus === 'RECOVERING'
-                        ? '#F0AE63'
-                        : '#78D6A3',
-                    boxShadow:
-                      missionStatus === 'BLOCKED'
-                        ? '0 0 6px #F25D5D'
-                        : missionStatus === 'RECOVERING'
-                        ? '0 0 6px #F0AE63'
-                        : '0 0 6px #78D6A3',
-                  }}
-                />
-                <span
-                  style={{
-                    color:
-                      missionStatus === 'BLOCKED'
-                        ? '#F25D5D'
-                        : missionStatus === 'RECOVERING'
-                        ? '#F0AE63'
-                        : '#78D6A3',
-                    fontWeight: 600,
-                  }}
-                >
-                  {missionStatus}
-                </span>
-              </div>
+            <div style={{ fontSize: '11px', color: '#8D9693', fontFamily: '"Inter", sans-serif', marginTop: '1px' }}>
+              Searching the affected area and rescuing survivors.
             </div>
-
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#68706D', fontSize: '10px' }}>TASKS:</span>
-              <span style={{ color: '#F2F4F2', fontWeight: 600 }}>9</span>
-            </div>
-
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#68706D', fontSize: '10px' }}>AGENTS:</span>
-              <span style={{ color: '#F2F4F2', fontWeight: 600 }}>{agents.length}</span>
-            </div>
-
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#68706D', fontSize: '10px' }}>ZONES:</span>
-              <span style={{ color: '#F2F4F2', fontWeight: 600 }}>3</span>
-            </div>
-
-            <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)' }} />
-
-            <span style={{ color: '#68706D' }}>T+</span>
-            <span style={{ color: '#A7ADAB' }}>{formatTimer(timeSeconds)}</span>
           </div>
         </div>
 
@@ -1104,6 +1099,33 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             )}
           </div>
 
+          {/* Ask MissionMind AI Chat Trigger Button (Spec §4) */}
+          <button
+            onClick={() => {
+              playUiTick();
+              setIsChatOpen(!isChatOpen);
+            }}
+            title="Ask MissionMind AI about the mission"
+            style={{
+              background: isChatOpen ? 'rgba(120, 214, 163, 0.16)' : 'rgba(255, 255, 255, 0.08)',
+              border: isChatOpen ? '1px solid #78D6A3' : '1px solid rgba(255, 255, 255, 0.28)',
+              borderRadius: '4px',
+              color: isChatOpen ? '#78D6A3' : '#F2F4F2',
+              padding: '6px 12px',
+              fontSize: '11px',
+              fontWeight: 600,
+              fontFamily: '"JetBrains Mono", monospace',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Sparkles size={12} color={isChatOpen ? '#78D6A3' : '#F0AE63'} />
+            <span>Ask MissionMind</span>
+          </button>
+
           {/* Recovery Stage button */}
           {onProceedToRecovery && (
             <button
@@ -1180,9 +1202,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 }}
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: '10px',
-                  padding: '7px 10px',
+                  padding: '8px 10px',
                   borderRadius: '4px',
                   border: 'none',
                   background: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
@@ -1192,12 +1214,19 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                   fontFamily: '"Inter", sans-serif',
                   textAlign: 'left',
                   cursor: 'pointer',
-                  borderLeft: isActive ? '2px solid #ffffff' : '2px solid transparent',
+                  borderLeft: isActive ? '2px solid #78D6A3' : '2px solid transparent',
                   transition: 'all 0.15s ease',
                 }}
               >
-                {item.icon}
-                <span>{item.label}</span>
+                <div style={{ marginTop: '2px', color: isActive ? '#78D6A3' : '#68706D' }}>
+                  {item.icon}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ color: isActive ? '#F2F4F2' : '#A7ADAB', fontWeight: 600 }}>{item.label}</span>
+                  <span style={{ fontSize: '9.5px', color: '#68706D', marginTop: '1px', lineHeight: 1.25 }}>
+                    {item.subtitle}
+                  </span>
+                </div>
               </button>
             );
           })}
@@ -1426,6 +1455,96 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             selectedAgentId={selectedAgentId}
           />
 
+          {/* Interactive Event Story Toast per Spec Section 22 & 24 */}
+          {selectedEvent && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                width: '360px',
+                background: 'rgba(8, 10, 11, 0.95)',
+                border: `1px solid ${
+                  selectedEvent.level === 'critical' ? '#F25D5D' : selectedEvent.level === 'warning' ? '#F0AE63' : '#78D6A3'
+                }`,
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.8)',
+                borderRadius: '6px',
+                padding: '14px 16px',
+                zIndex: 55,
+                backdropFilter: 'blur(8px)',
+                fontFamily: '"JetBrains Mono", monospace',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: selectedEvent.level === 'critical' ? '#F25D5D' : selectedEvent.level === 'warning' ? '#F0AE63' : '#78D6A3',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  EVENT HIGHLIGHT · {selectedEvent.timestamp}
+                </span>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#68706D',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F2F4F2', marginBottom: '6px', fontFamily: '"Inter", sans-serif' }}>
+                {selectedEvent.title}
+              </div>
+
+              <div style={{ fontSize: '11px', color: '#A7ADAB', lineHeight: 1.5, fontFamily: '"Inter", sans-serif' }}>
+                {selectedEvent.detail}
+              </div>
+
+              {selectedEvent.agentId && (
+                <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', fontSize: '10px', color: '#78D6A3' }}>
+                  Target highlighted on tactical map: Agent {selectedEvent.agentId}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Minimal Change Explanation Banner per Spec Section 26 */}
+          {d2RelayActive && !alternateRouteActive && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                background: 'rgba(8, 10, 11, 0.95)',
+                border: '1px solid #78D6A3',
+                borderRadius: '6px',
+                padding: '12px 16px',
+                zIndex: 50,
+                fontFamily: '"JetBrains Mono", monospace',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.7)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <div style={{ fontSize: '10px', color: '#78D6A3', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '4px' }}>
+                ADAPTIVE REPLAN COMPLETED
+              </div>
+              <div style={{ fontSize: '13px', color: '#F2F4F2', fontWeight: 600, fontFamily: '"Inter", sans-serif' }}>
+                2 of 9 tasks changed
+              </div>
+              <div style={{ fontSize: '11px', color: '#A7ADAB', marginTop: '2px', fontFamily: '"Inter", sans-serif' }}>
+                7 of 9 tasks stayed the same. The rest of the swarm remained stable.
+              </div>
+            </div>
+          )}
+
           {/* Alternate Route B Feasibility Overlay */}
           {showAlternateRouteModal && (
             <div
@@ -1624,9 +1743,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           {/* Task Status */}
           <TaskStatusPanel tasks={tasks} />
 
-          {/* Event Feed */}
+          {/* Event Feed per Spec Section 22, 23 & 24 */}
           <EventFeedPanel
             events={events}
+            selectedEventId={selectedEvent?.id}
+            onSelectEvent={handleSelectEvent}
             onOpenLogModal={() => setShowReasoningModal(true)}
           />
 
@@ -1663,6 +1784,32 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         isOpen={showLifelineModal}
         onApprove={handleApproveLifeline}
         onReject={handleRejectLifeline}
+      />
+
+      {/* MissionMind AI Chat Assistant Drawer (Addon Spec) */}
+      <MissionAssistantDrawer
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        ctx={assistantContext}
+        onHighlightAgent={(id) => {
+          setSelectedAgentId(id);
+          setActiveTab('Overview');
+        }}
+        onOpenDecision={() => {
+          if (lifelineProposal) {
+            setShowLifelineModal(true);
+          } else {
+            setShowReasoningModal(true);
+          }
+        }}
+        onSelectEvent={(eventId) => {
+          const ev = events.find((e) => e.id === eventId);
+          if (ev) setSelectedEvent(ev);
+          setActiveTab('Events');
+        }}
+        onShowReplan={() => {
+          setActiveTab('Tasks');
+        }}
       />
     </div>
   );

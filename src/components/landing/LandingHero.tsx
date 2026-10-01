@@ -60,7 +60,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
             <span>AI AUTONOMOUS SWARM COMMAND PLATFORM</span>
           </div>
 
-          {/* Hero Title */}
+          {/* Hero Title per Spec Section 6 */}
           <h1
             style={{
               fontSize: '42px',
@@ -72,14 +72,14 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            Give the mission objective.
+            Give the swarm a goal.
             <br />
             <span style={{ color: '#A7ADAB', fontWeight: 300 }}>
-              MissionMind decides what the swarm should do next.
+              MissionMind figures out what to do next.
             </span>
           </h1>
 
-          {/* Supporting description */}
+          {/* Supporting description per Spec Section 6 */}
           <p
             style={{
               color: '#8D9693',
@@ -90,10 +90,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            MissionMind coordinates heterogeneous agents — drones and GroundBot — to execute complex rescue missions with minimal human intervention.
+            MissionMind coordinates 3 drones and 1 GroundBot to search, adapt and rescue — without needing you to control every robot.
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons per Spec Section 6 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
               onClick={() => {
@@ -126,7 +126,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
               }}
             >
-              <span>Enter Mission Control</span>
+              <span>Try a Mission</span>
               <ArrowRight size={14} />
             </button>
 
@@ -150,7 +150,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
               onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
               onMouseLeave={(e) => (e.currentTarget.style.color = '#A7ADAB')}
             >
-              <span>Create Objective ↓</span>
+              <span>See How It Works ↓</span>
             </button>
           </div>
         </div>
@@ -169,36 +169,59 @@ export const LandingHero: React.FC<LandingHeroProps> = ({
         </div>
       </div>
 
-      {/* Bottom Telemetry Strip */}
+      {/* Bottom Telemetry Strip per Spec Section 7 */}
       <div
         style={{
           position: 'relative',
           zIndex: 10,
-          display: 'flex',
-          gap: '28px',
-          fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '11px',
-          color: '#68706D',
-          letterSpacing: '0.08em',
           borderTop: '1px solid rgba(255, 255, 255, 0.06)',
           paddingTop: '18px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
         }}
       >
-        <div>
-          <strong style={{ color: '#F2F4F2', fontWeight: 600 }}>4</strong> AGENTS
+        <div
+          style={{
+            fontFamily: '"Inter", sans-serif',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: '#F2F4F2',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#78D6A3' }} />
+          <span>4 robots ready to work together</span>
         </div>
-        <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
-        <div>
-          <strong style={{ color: '#78D6A3', fontWeight: 600 }}>3</strong> ACTIVE
-        </div>
-        <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
-        <div>
-          <strong style={{ color: '#A7ADAB', fontWeight: 600 }}>1</strong> STANDBY
-        </div>
-        <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#78D6A3' }} />
-          <span style={{ color: '#F2F4F2' }}>MISSION READY</span>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: '28px',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '11px',
+            color: '#68706D',
+            letterSpacing: '0.08em',
+          }}
+        >
+          <div>
+            <strong style={{ color: '#F2F4F2', fontWeight: 600 }}>4</strong> AGENTS
+          </div>
+          <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
+          <div>
+            <strong style={{ color: '#78D6A3', fontWeight: 600 }}>3</strong> ACTIVE
+          </div>
+          <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
+          <div>
+            <strong style={{ color: '#A7ADAB', fontWeight: 600 }}>1</strong> STANDBY
+          </div>
+          <div style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#78D6A3' }} />
+            <span style={{ color: '#F2F4F2' }}>MISSION READY</span>
+          </div>
         </div>
       </div>
     </section>

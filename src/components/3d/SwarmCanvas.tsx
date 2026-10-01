@@ -90,13 +90,12 @@ export const SwarmCanvas: React.FC<SwarmCanvasProps> = ({
     const d3Data = createQuadcopterDrone();
     const gbData = createGroundBotRover();
 
-    // Default hero layout matching visual reference
-    // D2 top center (high survey), D1 left (recon), D3 right (relay), GroundBot bottom center (chassis on terrain)
+    // Default hero layout matching visual reference and Spec Section 8
     const agentObjects = [
-      { id: 'D1', group: d1Data.group, rotors: d1Data.rotors, basePos: new THREE.Vector3(-4.8, 2.8, -0.5), speed: 1.1, name: 'DRONE-01', role: 'RECON', battery: 72 },
-      { id: 'D2', group: d2Data.group, rotors: d2Data.rotors, basePos: new THREE.Vector3(0.3, 4.6, -3.2), speed: 0.9, name: 'DRONE-02', role: 'SURVEY', battery: 81 },
-      { id: 'D3', group: d3Data.group, rotors: d3Data.rotors, basePos: new THREE.Vector3(5.2, 2.4, 0.8), speed: 1.2, name: 'DRONE-03', role: 'RELAY', battery: 68 },
-      { id: 'G1', group: gbData.group, wheels: gbData.wheels, mast: gbData.sensorMast, basePos: new THREE.Vector3(-0.6, -1.0, 3.8), speed: 0.5, name: 'GROUND-BOT', role: 'RESCUE', battery: 64 },
+      { id: 'D1', group: d1Data.group, rotors: d1Data.rotors, basePos: new THREE.Vector3(-4.8, 2.8, -0.5), speed: 1.1, name: 'DRONE 01', role: 'Search', battery: 72 },
+      { id: 'D2', group: d2Data.group, rotors: d2Data.rotors, basePos: new THREE.Vector3(0.3, 4.6, -3.2), speed: 0.9, name: 'DRONE 02', role: 'Search', battery: 81 },
+      { id: 'D3', group: d3Data.group, rotors: d3Data.rotors, basePos: new THREE.Vector3(5.2, 2.4, 0.8), speed: 1.2, name: 'DRONE 03', role: 'Relay + Search', battery: 68 },
+      { id: 'G1', group: gbData.group, wheels: gbData.wheels, mast: gbData.sensorMast, basePos: new THREE.Vector3(-0.6, -1.0, 3.8), speed: 0.5, name: 'GROUNDBOT 01', role: 'Rescue Support', battery: 64 },
     ];
 
     let droneOnlyRotors: THREE.Group[] = [];

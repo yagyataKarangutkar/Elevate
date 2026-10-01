@@ -22,9 +22,9 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
 
   const navLinks = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'Features' },
-    { id: 'blueprints', label: 'Blueprints' },
-    { id: 'mission-creation', label: 'Mission Flow' },
+    { id: 'how-it-works', label: 'How It Works' },
+    { id: 'about', label: 'About' },
+    { id: 'mission-creation', label: 'Live Demo' },
   ];
 
   return (
@@ -160,7 +160,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
           }}
         >
-          <span>Enter Mission Control</span>
+          <span>Try a Mission</span>
           <ArrowRight size={13} />
         </button>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check, Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { playUiTick, playSuccessChirp, playReplanningTone } from '../../utils/audio';
 
 interface MissionCreationSectionProps {
@@ -16,9 +16,9 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
   const [generationStep, setGenerationStep] = useState<number>(4); // 4 = ready
 
   const presets = [
-    'Search the affected area and rescue survivors.',
-    'Earthquake Sector A structural collapse inspection.',
-    'Hazardous chemical spill perimeter containment.',
+    'Find survivors in the affected area',
+    'Search Sector A and Sector B',
+    'Find survivors and bring help to Sector C',
   ];
 
   const handleGenerate = () => {
@@ -29,40 +29,50 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
     setTimeout(() => {
       setGenerationStep(2);
       playUiTick();
-    }, 600);
+    }, 400);
 
     setTimeout(() => {
       setGenerationStep(3);
       playUiTick();
-    }, 1200);
+    }, 800);
 
     setTimeout(() => {
       setGenerationStep(4);
+      playUiTick();
+    }, 1200);
+
+    setTimeout(() => {
+      setGenerationStep(5);
       setIsGenerating(false);
       playSuccessChirp();
-    }, 1800);
+    }, 1600);
   };
 
   const steps = [
     {
       num: 1,
-      title: 'Decompose Objective',
-      desc: 'Identify tasks, dependencies and priorities.',
+      title: 'UNDERSTANDING YOUR GOAL',
+      desc: 'Interpreting disaster parameters and primary rescue objectives.',
     },
     {
       num: 2,
-      title: 'Assign Agents',
-      desc: 'Match tasks with the right agents.',
+      title: 'BREAKING IT INTO TASKS',
+      desc: 'Decomposing mission into aerial sweeps, relay, and ground aid.',
     },
     {
       num: 3,
-      title: 'Plan & Route',
-      desc: 'Calculate the safest and fastest routes.',
+      title: 'CHOOSING THE RIGHT ROBOTS',
+      desc: 'Matching drone sensors and GroundBot capabilities to tasks.',
     },
     {
       num: 4,
-      title: 'Execute',
-      desc: 'Send commands to the swarm.',
+      title: 'PLANNING THE SAFEST ROUTES',
+      desc: 'Validating flight corridors and ground traversability.',
+    },
+    {
+      num: 5,
+      title: 'PLAN READY',
+      desc: 'Swarm tasks confirmed feasible with zero initial conflicts.',
     },
   ];
 
@@ -84,9 +94,13 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
           color: '#68706D',
           letterSpacing: '0.12em',
           marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
         }}
       >
-        03. MISSION CREATION
+        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#78D6A3' }} />
+        <span>04. INTERACTIVE DEMO</span>
       </div>
 
       <div
@@ -109,7 +123,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
               marginBottom: '14px',
             }}
           >
-            From a single objective<br />to a coordinated action.
+            What should the swarm do?
           </h2>
           <p
             style={{
@@ -120,7 +134,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
               maxWidth: '480px',
             }}
           >
-            Just tell us what you want to achieve. MissionMind breaks it down, assigns the right agents and builds the best plan — automatically.
+            Give MissionMind a goal in one sentence.
           </p>
 
           {/* Prompt Input Box */}
@@ -168,7 +182,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
                   color: '#68706D',
                 }}
               >
-                SWARM ENGINE: v4.2 HETEROGENEOUS
+                SWARM ENGINE: READY
               </span>
 
               <button
@@ -196,38 +210,50 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
                   </>
                 ) : (
                   <>
-                    <span>Generate Plan</span>
-                    <ArrowRight size={13} />
+                    <span>Create Plan →</span>
                   </>
                 )}
               </button>
             </div>
           </div>
 
-          {/* Quick preset chips */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {presets.map((preset, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  playUiTick();
-                  setObjective(preset);
-                }}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '20px',
-                  color: '#A7ADAB',
-                  fontSize: '11px',
-                  fontFamily: '"JetBrains Mono", monospace',
-                  padding: '4px 10px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {preset.substring(0, 32)}...
-              </button>
-            ))}
+          {/* Quick preset chips per Spec Section 13 */}
+          <div>
+            <div
+              style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '10px',
+                color: '#68706D',
+                marginBottom: '8px',
+                letterSpacing: '0.04em',
+              }}
+            >
+              TRY:
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {presets.map((preset, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    playUiTick();
+                    setObjective(preset);
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '20px',
+                    color: '#A7ADAB',
+                    fontSize: '11px',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    padding: '5px 12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  "{preset}"
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -310,7 +336,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
             }}
           >
             <div style={{ fontSize: '10px', color: '#68706D', letterSpacing: '0.08em', marginBottom: '4px' }}>
-              MISSION PLAN READY
+              READY TO START
             </div>
             <div
               style={{
@@ -322,8 +348,8 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <span style={{ fontSize: '11px', color: '#A7ADAB' }}>Confidence</span>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: '#78D6A3' }}>94%</span>
+              <span style={{ fontSize: '11px', color: '#A7ADAB' }}>Mission Status</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#78D6A3' }}>Can be completed</span>
             </div>
 
             {/* Task list matching visual reference */}
@@ -385,8 +411,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
                 transition: 'all 0.2s',
               }}
             >
-              <span>View Plan Details / Start</span>
-              <ArrowRight size={13} />
+              <span>Start Mission →</span>
             </button>
           </div>
         </div>
