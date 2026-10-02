@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SwarmCanvas } from '../3d/SwarmCanvas';
 import { X, Check, AlertTriangle, Layers, Battery, Radio, Compass, ShieldAlert } from 'lucide-react';
 import { playUiTick } from '../../utils/audio';
@@ -12,6 +12,18 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
   isOpen,
   onClose,
 }) => {
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -25,7 +37,7 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px',
+        padding: isMobile ? '12px' : '24px',
         animation: 'fadeIn 0.25s ease',
       }}
     >
@@ -33,10 +45,11 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
         style={{
           width: '100%',
           maxWidth: '920px',
+          maxHeight: '92vh',
+          overflowY: 'auto',
           background: '#080A0B',
           border: '1px solid rgba(255, 255, 255, 0.16)',
           borderRadius: '8px',
-          overflow: 'hidden',
           boxShadow: '0 0 50px rgba(0, 0, 0, 0.9)',
           position: 'relative',
         }}
@@ -47,7 +60,7 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '16px 24px',
+            padding: isMobile ? '14px 16px' : '16px 24px',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
@@ -73,7 +86,9 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
               border: 'none',
               color: '#A7ADAB',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '8px',
+              minWidth: '40px',
+              minHeight: '40px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -84,11 +99,11 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
         </div>
 
         {/* Content body matching bottom-right screenshot */}
-        <div style={{ padding: '28px' }}>
-          <div style={{ marginBottom: '24px' }}>
+        <div style={{ padding: isMobile ? '16px' : '28px' }}>
+          <div style={{ marginBottom: isMobile ? '16px' : '24px' }}>
             <h2
               style={{
-                fontSize: '24px',
+                fontSize: isMobile ? '20px' : '24px',
                 fontWeight: 500,
                 color: '#F2F4F2',
                 marginBottom: '6px',
@@ -112,8 +127,8 @@ export const DecisionExplanationModal: React.FC<DecisionExplanationModalProps> =
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.2fr 1fr',
-              gap: '28px',
+              gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr',
+              gap: isMobile ? '20px' : '28px',
               alignItems: 'center',
             }}
           >

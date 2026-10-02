@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FlowNavbar } from './FlowNavbar';
 import {
   ArrowRight,
@@ -10,6 +10,7 @@ import {
   Radio,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
   Sparkles,
 } from 'lucide-react';
 import { playUiTick, playSuccessChirp } from '../../utils/audio';
@@ -25,6 +26,17 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
   onProceedToComplete,
 }) => {
   const [activeStep, setActiveStep] = useState<number>(4);
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const recoverySteps = [
     {
@@ -79,10 +91,10 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
           maxWidth: '1000px',
           width: '100%',
           margin: '0 auto',
-          padding: '40px 24px 60px',
+          padding: isMobile ? '20px 16px 48px' : '40px 24px 60px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: isMobile ? '20px' : '28px',
         }}
       >
         {/* Header - Spec Section 25: Plain English headline */}
@@ -105,7 +117,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
 
           <h1
             style={{
-              fontSize: '32px',
+              fontSize: 'clamp(20px, 4.5vw, 32px)',
               fontWeight: 500,
               letterSpacing: '-0.02em',
               lineHeight: 1.25,
@@ -122,20 +134,22 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
               background: 'rgba(240, 174, 99, 0.1)',
               border: '1px solid rgba(240, 174, 99, 0.3)',
               borderRadius: '6px',
-              padding: '14px 18px',
+              padding: isMobile ? '12px 14px' : '14px 18px',
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: isMobile ? 'flex-start' : 'center',
               justifyContent: 'space-between',
+              gap: isMobile ? '10px' : '16px',
               fontFamily: '"Inter", sans-serif',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Radio size={18} color="#F0AE63" />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <Radio size={18} color="#F0AE63" style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
                 <span style={{ fontSize: '11px', color: '#F0AE63', fontFamily: '"JetBrains Mono", monospace', fontWeight: 600, display: 'block' }}>
                   WHAT HAPPENED?
                 </span>
-                <span style={{ fontSize: '14px', color: '#F2F4F2', fontWeight: 500 }}>
+                <span style={{ fontSize: '14px', color: '#F2F4F2', fontWeight: 500, lineHeight: 1.4 }}>
                   Drone 03 lost communication with the swarm in Sector C.
                 </span>
               </div>
@@ -161,7 +175,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '8px',
-            padding: '24px',
+            padding: isMobile ? '16px' : '24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '18px',
@@ -182,7 +196,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
               gap: '12px',
             }}
           >
@@ -199,7 +213,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                     background: isSelected ? 'rgba(120, 214, 163, 0.08)' : 'rgba(255, 255, 255, 0.02)',
                     border: isSelected ? '1px solid #78D6A3' : '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '6px',
-                    padding: '16px',
+                    padding: isMobile ? '14px' : '16px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     display: 'flex',
@@ -241,13 +255,21 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '8px',
-            padding: '24px',
+            padding: isMobile ? '16px' : '24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '18px',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '8px' : '12px',
+            }}
+          >
             <div
               style={{
                 fontFamily: '"JetBrains Mono", monospace',
@@ -279,13 +301,13 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '6px' : '16px',
                 background: 'rgba(255, 255, 255, 0.02)',
                 border: '1px solid rgba(255, 255, 255, 0.06)',
                 borderRadius: '6px',
-                padding: '12px 18px',
+                padding: isMobile ? '10px 14px' : '12px 18px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
               }}
@@ -294,7 +316,14 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                 <span style={{ fontWeight: 700, color: '#78D6A3' }}>Drone 01: </span>
                 <span style={{ color: '#A7ADAB' }}>Searching Sector A</span>
               </div>
-              <ChevronRight size={14} color="#68706D" />
+              {isMobile ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#68706D' }}>
+                  <ChevronDown size={12} />
+                  <span style={{ fontSize: '10px' }}>STATUS</span>
+                </div>
+              ) : (
+                <ChevronRight size={14} color="#68706D" />
+              )}
               <div style={{ color: '#78D6A3', fontWeight: 600 }}>
                 Unchanged <span style={{ fontSize: '10px', color: '#68706D', fontWeight: 400 }}>(still on track)</span>
               </div>
@@ -304,13 +333,13 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '6px' : '16px',
                 background: 'rgba(120, 214, 163, 0.06)',
                 border: '1px solid rgba(120, 214, 163, 0.3)',
                 borderRadius: '6px',
-                padding: '12px 18px',
+                padding: isMobile ? '10px 14px' : '12px 18px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
               }}
@@ -319,7 +348,14 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                 <span style={{ fontWeight: 700, color: '#78D6A3' }}>Drone 02: </span>
                 <span style={{ color: '#A7ADAB' }}>Searching Sector B</span>
               </div>
-              <ChevronRight size={14} color="#78D6A3" />
+              {isMobile ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#78D6A3' }}>
+                  <ChevronDown size={12} />
+                  <span style={{ fontSize: '10px' }}>REASSIGNMENT</span>
+                </div>
+              ) : (
+                <ChevronRight size={14} color="#78D6A3" />
+              )}
               <div style={{ color: '#78D6A3', fontWeight: 700 }}>
                 NOW SEARCHING SECTOR B + C <span style={{ fontSize: '10px', color: '#F0AE63', fontWeight: 400 }}>(expanded coverage)</span>
               </div>
@@ -329,13 +365,13 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '6px' : '16px',
                 background: 'rgba(242, 93, 93, 0.06)',
                 border: '1px solid rgba(242, 93, 93, 0.25)',
                 borderRadius: '6px',
-                padding: '12px 18px',
+                padding: isMobile ? '10px 14px' : '12px 18px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
               }}
@@ -344,7 +380,14 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                 <span style={{ fontWeight: 700, color: '#F25D5D' }}>Drone 03: </span>
                 <span style={{ color: '#A7ADAB' }}>Communication lost</span>
               </div>
-              <ChevronRight size={14} color="#F25D5D" />
+              {isMobile ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#F25D5D' }}>
+                  <ChevronDown size={12} />
+                  <span style={{ fontSize: '10px' }}>STATUS</span>
+                </div>
+              ) : (
+                <ChevronRight size={14} color="#F25D5D" />
+              )}
               <div style={{ color: '#F25D5D', fontWeight: 600 }}>
                 OFFLINE <span style={{ fontSize: '10px', color: '#68706D', fontWeight: 400 }}>(tasks reassigned safely)</span>
               </div>
@@ -354,13 +397,13 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr auto 1fr',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '6px' : '16px',
                 background: 'rgba(255, 255, 255, 0.02)',
                 border: '1px solid rgba(255, 255, 255, 0.06)',
                 borderRadius: '6px',
-                padding: '12px 18px',
+                padding: isMobile ? '10px 14px' : '12px 18px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
               }}
@@ -369,7 +412,14 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                 <span style={{ fontWeight: 700, color: '#78D6A3' }}>GroundBot 01: </span>
                 <span style={{ color: '#A7ADAB' }}>Rescuing survivor in Sector A</span>
               </div>
-              <ChevronRight size={14} color="#68706D" />
+              {isMobile ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#68706D' }}>
+                  <ChevronDown size={12} />
+                  <span style={{ fontSize: '10px' }}>STATUS</span>
+                </div>
+              ) : (
+                <ChevronRight size={14} color="#68706D" />
+              )}
               <div style={{ color: '#78D6A3', fontWeight: 600 }}>
                 Unchanged <span style={{ fontSize: '10px', color: '#68706D', fontWeight: 400 }}>(continues extraction)</span>
               </div>
@@ -382,15 +432,17 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
               background: 'rgba(120, 214, 163, 0.08)',
               border: '1px solid rgba(120, 214, 163, 0.3)',
               borderRadius: '6px',
-              padding: '16px 20px',
+              padding: isMobile ? '12px 14px' : '16px 20px',
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: isMobile ? 'flex-start' : 'center',
               justifyContent: 'space-between',
+              gap: isMobile ? '10px' : '16px',
               fontFamily: '"JetBrains Mono", monospace',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={16} color="#78D6A3" />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <Sparkles size={16} color="#78D6A3" style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#78D6A3', letterSpacing: '0.04em' }}>
                   2 of 9 tasks changed · 7 of 9 tasks stayed the same
@@ -400,7 +452,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
                 </span>
               </div>
             </div>
-            <span style={{ fontSize: '11px', color: '#78D6A3', fontWeight: 600 }}>
+            <span style={{ fontSize: '11px', color: '#78D6A3', fontWeight: 600, flexShrink: 0 }}>
               78% PLAN STABILITY
             </span>
           </div>
@@ -410,7 +462,7 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
             gap: '12px',
           }}
         >
@@ -495,8 +547,10 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
         <div
           style={{
             display: 'flex',
+            flexDirection: isMobile ? 'column-reverse' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'stretch',
+            gap: '12px',
             borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             paddingTop: '20px',
           }}
@@ -511,13 +565,16 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '4px',
               color: '#A7ADAB',
-              padding: '10px 18px',
+              padding: isMobile ? '12px 18px' : '10px 18px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '6px',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <ArrowLeft size={13} />
@@ -534,14 +591,17 @@ export const MissionRecoveryView: React.FC<MissionRecoveryViewProps> = ({
               color: '#050607',
               border: 'none',
               borderRadius: '4px',
-              padding: '12px 24px',
+              padding: isMobile ? '14px 24px' : '12px 24px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <span>Proceed to Mission Complete</span>

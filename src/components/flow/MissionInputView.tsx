@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlowNavbar } from './FlowNavbar';
 import {
   ArrowRight,
@@ -69,6 +69,17 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
   const [objective, setObjective] = useState<string>(initialObjective);
   const [selectedAgentIds, setSelectedAgentIds] = useState<AgentId[]>(initialSelectedAgentIds);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
 
   const toggleAgent = (id: AgentId) => {
     playUiTick();
@@ -143,10 +154,10 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
           maxWidth: '1080px',
           width: '100%',
           margin: '0 auto',
-          padding: '40px 24px 64px',
+          padding: isMobile ? '24px 16px 48px' : '40px 24px 64px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: isMobile ? '20px' : '28px',
         }}
       >
         {/* Header Eyebrow & Title per Spec Section 13 */}
@@ -177,7 +188,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
 
           <h1
             style={{
-              fontSize: '32px',
+              fontSize: 'clamp(24px, 5.5vw, 32px)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.2,
@@ -192,7 +203,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
           <p
             style={{
               color: '#A7ADAB',
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px',
               maxWidth: '680px',
               lineHeight: 1.6,
             }}
@@ -207,7 +218,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.14)',
             borderRadius: '6px',
-            padding: '20px 24px',
+            padding: isMobile ? '16px' : '20px 24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
@@ -331,7 +342,15 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
             gap: '16px',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              gap: '12px',
+            }}
+          >
             <div>
               <div
                 style={{
@@ -344,12 +363,21 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               >
                 SWARM AGENT ALLOCATION
               </div>
-              <div style={{ fontSize: '12px', color: '#68706D', marginTop: '2px' }}>
+              <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#68706D', marginTop: '2px' }}>
                 Select available aerial and ground assets to deploy for this objective.
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isMobile ? 'space-between' : 'flex-end',
+                width: isMobile ? '100%' : 'auto',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
+            >
               <span
                 style={{
                   fontFamily: '"JetBrains Mono", monospace',
@@ -371,7 +399,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
                     color: '#A7ADAB',
                     fontSize: '10px',
                     fontFamily: '"JetBrains Mono", monospace',
-                    padding: '3px 8px',
+                    padding: '4px 10px',
                     cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#F2F4F2')}
@@ -389,7 +417,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
                     color: '#A7ADAB',
                     fontSize: '10px',
                     fontFamily: '"JetBrains Mono", monospace',
-                    padding: '3px 8px',
+                    padding: '4px 10px',
                     cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#F2F4F2')}
@@ -614,10 +642,12 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
         <div
           style={{
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            paddingTop: '24px',
+            paddingTop: '20px',
             display: 'flex',
+            flexDirection: isMobile ? 'column-reverse' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: isMobile ? 'stretch' : 'center',
+            gap: '12px',
           }}
         >
           <button
@@ -630,12 +660,16 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               background: 'transparent',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               color: '#A7ADAB',
-              padding: '10px 18px',
+              padding: '12px 18px',
+              minHeight: '44px',
               borderRadius: '4px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               cursor: 'pointer',
               transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = '#F2F4F2';
@@ -658,7 +692,8 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               color: '#050607',
               border: 'none',
               borderRadius: '4px',
-              padding: '12px 28px',
+              padding: '14px 28px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               fontWeight: 600,
@@ -666,6 +701,7 @@ export const MissionInputView: React.FC<MissionInputViewProps> = ({
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
               boxShadow: '0 2px 12px rgba(255, 255, 255, 0.15)',
               transition: 'all 0.2s',

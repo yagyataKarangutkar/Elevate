@@ -1,10 +1,24 @@
+import { useState, useEffect } from 'react';
+
 export const Footer: React.FC = () => {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+
   return (
     <footer
       style={{
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         background: '#050607',
-        padding: '48px 48px 32px',
+        padding: isMobile ? '40px 16px 24px' : '48px 48px 32px',
         color: '#A7ADAB',
         fontSize: '12px',
         fontFamily: '"Inter", sans-serif',
@@ -18,7 +32,7 @@ export const Footer: React.FC = () => {
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           flexWrap: 'wrap',
-          gap: '32px',
+          gap: isMobile ? '24px' : '32px',
           marginBottom: '32px',
         }}
       >
@@ -67,7 +81,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Center: Navigation links */}
-        <div style={{ display: 'flex', gap: '48px' }}>
+        <div style={{ display: 'flex', gap: isMobile ? '32px' : '48px', flexWrap: 'wrap' }}>
           <div>
             <div
               style={{
@@ -115,7 +129,7 @@ export const Footer: React.FC = () => {
             fontFamily: '"JetBrains Mono", monospace',
             fontSize: '10px',
             color: '#68706D',
-            textAlign: 'right',
+            textAlign: isMobile ? 'left' : 'right',
             lineHeight: 1.6,
           }}
         >
@@ -132,8 +146,10 @@ export const Footer: React.FC = () => {
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
           paddingTop: '20px',
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          gap: '8px',
           fontFamily: '"JetBrains Mono", monospace',
           fontSize: '10px',
           color: '#454C4A',
@@ -145,3 +161,4 @@ export const Footer: React.FC = () => {
     </footer>
   );
 };
+

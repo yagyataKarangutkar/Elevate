@@ -132,7 +132,7 @@ export const PlanGenerationView: React.FC<PlanGenerationViewProps> = ({
           maxWidth: '820px',
           width: '100%',
           margin: '0 auto',
-          padding: '60px 24px',
+          padding: 'clamp(28px, 6vw, 60px) clamp(16px, 4vw, 24px)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

@@ -268,16 +268,16 @@ export const BlueprintSection: React.FC = () => {
         style={{
           display: 'flex',
           flexWrap: 'wrap',
-          alignItems: 'flex-end',
+          alignItems: isMobile ? 'flex-start' : 'flex-end',
           justifyContent: 'space-between',
-          gap: '24px',
-          marginBottom: '36px',
+          gap: '20px',
+          marginBottom: '28px',
         }}
       >
-        <div>
+        <div style={{ maxWidth: '680px' }}>
           <h2
             style={{
-              fontSize: '36px',
+              fontSize: 'clamp(24px, 5vw, 36px)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               color: '#F2F4F2',
@@ -291,7 +291,7 @@ export const BlueprintSection: React.FC = () => {
           <p
             style={{
               color: '#A7ADAB',
-              fontSize: '15px',
+              fontSize: isMobile ? '13px' : '15px',
               lineHeight: 1.6,
               maxWidth: '680px',
               margin: 0,
@@ -306,11 +306,13 @@ export const BlueprintSection: React.FC = () => {
         <div
           style={{
             display: 'flex',
+            flexWrap: 'wrap',
             gap: '8px',
             background: 'rgba(255, 255, 255, 0.03)',
             padding: '4px',
             borderRadius: '8px',
             border: '1px solid rgba(255, 255, 255, 0.08)',
+            width: isMobile ? '100%' : 'auto',
           }}
         >
           {(['specter', 'argus', 'aegis'] as const).map((id) => {
@@ -325,15 +327,17 @@ export const BlueprintSection: React.FC = () => {
                   color: isSelected ? '#FFFFFF' : '#8D9693',
                   border: isSelected ? '1px solid rgba(255, 255, 255, 0.22)' : '1px solid transparent',
                   borderRadius: '6px',
-                  padding: '8px 14px',
+                  padding: '8px 12px',
                   fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: '12px',
+                  fontSize: '11px',
                   letterSpacing: '0.04em',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
+                  flex: isMobile ? '1 1 auto' : 'none',
+                  justifyContent: 'center',
                 }}
               >
                 <span
@@ -369,8 +373,8 @@ export const BlueprintSection: React.FC = () => {
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '10px',
             overflow: 'hidden',
-            minHeight: isMobile ? '360px' : '500px',
-            height: isMobile ? '380px' : 'auto',
+            minHeight: isMobile ? '340px' : '500px',
+            height: isMobile ? '360px' : 'auto',
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -378,7 +382,7 @@ export const BlueprintSection: React.FC = () => {
           {/* Top HUD Bar */}
           <div
             style={{
-              padding: '16px 20px',
+              padding: isMobile ? '10px 14px' : '16px 20px',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               display: 'flex',
               alignItems: 'center',
@@ -389,36 +393,42 @@ export const BlueprintSection: React.FC = () => {
               zIndex: 10,
               background: 'rgba(8, 10, 11, 0.7)',
               backdropFilter: 'blur(8px)',
+              flexWrap: 'wrap',
+              gap: '6px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ color: '#F2F4F2', fontWeight: 600 }}>{unit.name}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: '#F2F4F2', fontWeight: 600, fontSize: isMobile ? '11px' : '12px' }}>{unit.name}</span>
               <span style={{ color: '#454C49' }}>/</span>
-              <span style={{ color: '#78D6A3' }}>{unit.statusBadge}</span>
+              <span style={{ color: '#78D6A3', fontSize: '10px' }}>{unit.statusBadge}</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Activity size={12} color="#78D6A3" />
-                <span>TELEMETRY SYNC</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Activity size={11} color="#78D6A3" />
+                <span style={{ fontSize: '10px' }}>SYNCED</span>
               </div>
-              <div style={{ color: '#454C49' }}>•</div>
-              <div>INTERACTIVE 3D SCHEMATIC</div>
+              {!isMobile && (
+                <>
+                  <div style={{ color: '#454C49' }}>•</div>
+                  <div>INTERACTIVE 3D SCHEMATIC</div>
+                </>
+              )}
             </div>
           </div>
 
           {/* 3D Canvas Area */}
-          <div style={{ flex: 1, position: 'relative', minHeight: '380px' }}>
+          <div style={{ flex: 1, position: 'relative', minHeight: isMobile ? '240px' : '380px' }}>
             <SwarmCanvas mode={unit.canvasMode} interactive={true} />
 
             {/* Floating Technical HUD Tags */}
             <div
               style={{
                 position: 'absolute',
-                bottom: '20px',
-                left: '20px',
+                bottom: isMobile ? '10px' : '20px',
+                left: isMobile ? '10px' : '20px',
                 display: 'flex',
-                gap: '16px',
+                gap: isMobile ? '8px' : '16px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '11px',
                 color: '#68706D',
@@ -428,15 +438,15 @@ export const BlueprintSection: React.FC = () => {
               <div
                 style={{
                   background: 'rgba(5, 6, 7, 0.85)',
-                  padding: '8px 12px',
+                  padding: isMobile ? '6px 10px' : '8px 12px',
                   borderRadius: '4px',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#8D9693', marginBottom: '2px' }}>
+                <div style={{ fontSize: '8.5px', color: '#8D9693', marginBottom: '2px' }}>
                   {unit.primaryMetric.label}
                 </div>
-                <div style={{ fontSize: '13px', color: '#F2F4F2', fontWeight: 600 }}>
+                <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#F2F4F2', fontWeight: 600 }}>
                   {unit.primaryMetric.value}
                 </div>
               </div>
@@ -444,15 +454,15 @@ export const BlueprintSection: React.FC = () => {
               <div
                 style={{
                   background: 'rgba(5, 6, 7, 0.85)',
-                  padding: '8px 12px',
+                  padding: isMobile ? '6px 10px' : '8px 12px',
                   borderRadius: '4px',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
               >
-                <div style={{ fontSize: '9px', color: '#8D9693', marginBottom: '2px' }}>
+                <div style={{ fontSize: '8.5px', color: '#8D9693', marginBottom: '2px' }}>
                   {unit.secondaryMetric.label}
                 </div>
-                <div style={{ fontSize: '13px', color: '#78D6A3', fontWeight: 600 }}>
+                <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#78D6A3', fontWeight: 600 }}>
                   {unit.secondaryMetric.value}
                 </div>
               </div>

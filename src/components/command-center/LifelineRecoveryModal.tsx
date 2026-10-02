@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle2, Clock, ArrowRight, ShieldAlert } from 'lucide-react';
 import type { LifelineInterventionProposal } from '../../engine';
 import { playSuccessChirp, playAlertAlarm } from '../../utils/audio';
@@ -16,6 +16,18 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
   onApprove,
   onReject,
 }) => {
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!isOpen || !proposal) return null;
 
   return (
@@ -29,7 +41,7 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
+        padding: isMobile ? '12px' : '20px',
         animation: 'fadeIn 0.2s ease',
       }}
     >
@@ -37,10 +49,12 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '560px',
+          maxHeight: '92vh',
+          overflowY: 'auto',
           background: '#080A0B',
           border: '1px solid rgba(242, 93, 93, 0.45)',
           borderRadius: '8px',
-          padding: '26px',
+          padding: isMobile ? '16px' : '26px',
           boxShadow: '0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(242, 93, 93, 0.12)',
           fontFamily: '"JetBrains Mono", monospace',
           position: 'relative',
@@ -204,7 +218,13 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
             <span>HUMAN APPROVAL REQUIRED</span>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '10px' : '12px',
+            }}
+          >
             <button
               onClick={() => {
                 playSuccessChirp();
@@ -216,7 +236,8 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
                 color: '#050607',
                 border: 'none',
                 borderRadius: '4px',
-                padding: '12px',
+                padding: isMobile ? '14px 16px' : '12px',
+                minHeight: '44px',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -237,12 +258,13 @@ export const LifelineRecoveryModal: React.FC<LifelineRecoveryModalProps> = ({
                 onReject();
               }}
               style={{
-                flex: 1,
+                flex: isMobile ? 'none' : 1,
                 background: 'transparent',
                 color: '#F25D5D',
                 border: '1px solid rgba(242, 93, 93, 0.4)',
                 borderRadius: '4px',
-                padding: '12px',
+                padding: isMobile ? '12px 16px' : '12px',
+                minHeight: '44px',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',

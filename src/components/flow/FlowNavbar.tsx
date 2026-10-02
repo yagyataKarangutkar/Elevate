@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { toggleAudio, playUiTick } from '../../utils/audio';
 import type { FlowStep } from '../../types';
@@ -30,6 +30,18 @@ export const FlowNavbar: React.FC<FlowNavbarProps> = ({
   onBack,
 }) => {
   const [audioActive, setAudioActive] = useState<boolean>(true);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isNarrow = windowWidth < 960;
 
   const handleAudioToggle = () => {
     const current = toggleAudio();
@@ -46,7 +58,7 @@ export const FlowNavbar: React.FC<FlowNavbarProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: isMobile ? '0 12px' : '0 24px',
         background: '#080A0B',
         position: 'sticky',
         top: 0,
@@ -54,7 +66,7 @@ export const FlowNavbar: React.FC<FlowNavbarProps> = ({
       }}
     >
       {/* Left: Brand + Back */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px' }}>
         {showBack && (
           <button
             onClick={() => {
@@ -125,7 +137,7 @@ export const FlowNavbar: React.FC<FlowNavbarProps> = ({
           <span style={{ color: '#F2F4F2' }}>MissionMind</span>
         </div>
 
-        {title && (
+        {!isMobile && title && (
           <>
             <div style={{ width: '1px', height: '14px', background: 'rgba(255, 255, 255, 0.12)' }} />
             <span
@@ -142,63 +154,87 @@ export const FlowNavbar: React.FC<FlowNavbarProps> = ({
         )}
       </div>
 
-      {/* Center: Stage Progression Breadcrumbs */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '10px',
-        }}
-      >
-        {STAGES.map((stage, idx) => {
-          const isActive = stage.key === currentStep;
-          const isPassed = idx < currentIndex;
+      {/* Center: Stage Progression Breadcrumbs or Mobile Compact Chip */}
+      {isNarrow ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: '16px',
+            padding: '3px 10px',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '10px',
+          }}
+        >
+          <span style={{ color: '#78D6A3', fontWeight: 700 }}>
+            {STAGES[currentIndex]?.stepNum || '01'}/08
+          </span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.2)' }}>•</span>
+          <span style={{ color: '#F2F4F2', fontWeight: 600 }}>
+            {STAGES[currentIndex]?.label || 'STAGE'}
+          </span>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '10px',
+          }}
+        >
+          {STAGES.map((stage, idx) => {
+            const isActive = stage.key === currentStep;
+            const isPassed = idx < currentIndex;
 
-          return (
-            <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                onClick={() => {
-                  playUiTick();
-                  onNavigate(stage.key);
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '4px 6px',
-                  borderRadius: '3px',
-                  color: isActive
-                    ? '#F2F4F2'
-                    : isPassed
-                    ? '#78D6A3'
-                    : '#454C4A',
-                  fontWeight: isActive ? 600 : 400,
-                  transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.color = '#A7ADAB';
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color = isPassed ? '#78D6A3' : '#454C4A';
-                  }
-                }}
-              >
-                <span style={{ opacity: isActive ? 1 : 0.6 }}>{stage.stepNum}</span>
-                <span>{stage.label}</span>
-              </button>
-              {idx < STAGES.length - 1 && (
-                <span style={{ color: 'rgba(255, 255, 255, 0.15)', fontSize: '9px' }}>→</span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => {
+                    playUiTick();
+                    onNavigate(stage.key);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 6px',
+                    borderRadius: '3px',
+                    color: isActive
+                      ? '#F2F4F2'
+                      : isPassed
+                      ? '#78D6A3'
+                      : '#454C4A',
+                    fontWeight: isActive ? 600 : 400,
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.color = '#A7ADAB';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = isPassed ? '#78D6A3' : '#454C4A';
+                    }
+                  }}
+                >
+                  <span style={{ opacity: isActive ? 1 : 0.6 }}>{stage.stepNum}</span>
+                  <span>{stage.label}</span>
+                </button>
+                {idx < STAGES.length - 1 && (
+                  <span style={{ color: 'rgba(255, 255, 255, 0.15)', fontSize: '9px' }}>→</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Right Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

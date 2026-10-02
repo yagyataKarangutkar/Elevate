@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FlowNavbar } from './FlowNavbar';
 import {
   ArrowLeft,
@@ -22,6 +22,18 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
   onNavigate,
   onRestart,
 }) => {
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Execute comparative benchmark from simulator engine
   const [benchmarkData, setBenchmarkData] = useState<{
     staticPlan: ComparisonStrategyResult;
@@ -69,14 +81,14 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
           maxWidth: '1100px',
           width: '100%',
           margin: '0 auto',
-          padding: '36px 24px',
+          padding: isMobile ? '20px 16px 48px' : '36px 24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: isMobile ? '20px' : '28px',
         }}
       >
         {/* Header Section */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', flexDirection: isMobile ? 'column' : 'row', gap: '16px' }}>
           <div>
             <div
               style={{
@@ -95,7 +107,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
             </div>
             <h1
               style={{
-                fontSize: '32px',
+                fontSize: 'clamp(20px, 4.5vw, 32px)',
                 fontWeight: 500,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.2,
@@ -108,7 +120,7 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
             <p
               style={{
                 color: '#A7ADAB',
-                fontSize: '14px',
+                fontSize: '13px',
                 maxWidth: '680px',
                 fontFamily: '"Inter", sans-serif',
                 lineHeight: 1.5,
@@ -127,15 +139,18 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
               border: 'none',
               color: '#050607',
               borderRadius: '4px',
-              padding: '10px 18px',
+              padding: isMobile ? '12px 18px' : '10px 18px',
+              minHeight: '42px',
               fontSize: '11px',
               fontWeight: 600,
               fontFamily: '"JetBrains Mono", monospace',
               cursor: isSimulating ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
               flexShrink: 0,
+              width: isMobile ? '100%' : 'auto',
               transition: 'all 0.15s ease',
             }}
           >
@@ -261,16 +276,19 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
             overflowX: 'auto',
             fontFamily: '"JetBrains Mono", monospace',
           }}
+          className="horizontal-scroll-container"
         >
           {/* Table Header Bar */}
           <div
             style={{
-              padding: '14px 20px',
+              padding: isMobile ? '12px 14px' : '14px 20px',
               background: 'rgba(255, 255, 255, 0.02)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              gap: isMobile ? '4px' : '8px',
             }}
           >
             <div style={{ fontSize: '12px', fontWeight: 600, color: '#F2F4F2', letterSpacing: '0.06em' }}>
@@ -672,8 +690,10 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
             paddingTop: '20px',
             display: 'flex',
+            flexDirection: isMobile ? 'column-reverse' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'stretch',
+            gap: isMobile ? '12px' : '16px',
           }}
         >
           <button
@@ -686,13 +706,16 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '4px',
               color: '#A7ADAB',
-              padding: '10px 18px',
+              padding: isMobile ? '12px 18px' : '10px 18px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '6px',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <ArrowLeft size={13} />
@@ -709,14 +732,17 @@ export const MissionResultsView: React.FC<MissionResultsViewProps> = ({
               color: '#050607',
               border: 'none',
               borderRadius: '4px',
-              padding: '10px 24px',
+              padding: isMobile ? '14px 24px' : '10px 24px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <RotateCcw size={13} />

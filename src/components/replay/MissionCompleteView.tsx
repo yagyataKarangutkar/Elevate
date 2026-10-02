@@ -134,6 +134,17 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
   onProceedToResults,
 }) => {
   const replaySectionRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Construct replay timeline
   const [timelineNodes, setTimelineNodes] = useState<ReplayTimelineNode[]>([]);
@@ -197,7 +208,7 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
         minHeight: '100vh',
         background: '#050607',
         color: '#F2F4F2',
-        padding: '36px 24px 60px',
+        padding: isMobile ? '20px 16px 48px' : '36px 24px 60px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -205,7 +216,7 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
     >
       <div style={{ width: '100%', maxWidth: '1180px' }}>
         {/* Top Header Badge & Spec Section 33 Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '28px' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -229,16 +240,17 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
           {/* Spec Section 33: "Mission complete. The swarm completed the rescue objective." */}
           <h1
             style={{
-              fontSize: '34px',
+              fontSize: 'clamp(20px, 4.5vw, 34px)',
               fontWeight: 500,
               letterSpacing: '-0.02em',
               marginBottom: '10px',
               fontFamily: '"JetBrains Mono", monospace',
+              lineHeight: 1.25,
             }}
           >
             Mission complete. The swarm completed the rescue objective.
           </h1>
-          <p style={{ color: '#A7ADAB', fontSize: '14px', maxWidth: '640px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
+          <p style={{ color: '#A7ADAB', fontSize: '13px', maxWidth: '640px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
             Four robots worked together, adapted to disruptions autonomously, and rescued all detected survivors.
           </p>
         </div>
@@ -249,22 +261,24 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
             background: 'rgba(120, 214, 163, 0.08)',
             border: '1px solid rgba(120, 214, 163, 0.35)',
             borderRadius: '8px',
-            padding: '18px 24px',
+            padding: isMobile ? '14px 16px' : '18px 24px',
             marginBottom: '16px',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
             justifyContent: 'space-between',
+            gap: isMobile ? '12px' : '16px',
             fontFamily: '"JetBrains Mono", monospace',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <CheckCircle2 size={24} color="#78D6A3" />
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <CheckCircle2 size={22} color="#78D6A3" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
               {/* Spec Section 33 verbatim: "3 survivors found · 4 robots deployed · 2 tasks reassigned" */}
-              <div style={{ fontSize: '20px', fontWeight: 700, color: '#78D6A3', letterSpacing: '0.04em' }}>
+              <div style={{ fontSize: 'clamp(15px, 4vw, 20px)', fontWeight: 700, color: '#78D6A3', letterSpacing: '0.04em', lineHeight: 1.3 }}>
                 3 survivors found · 4 robots deployed · 2 tasks reassigned
               </div>
-              <div style={{ fontSize: '12px', color: '#A7ADAB', marginTop: '3px', fontFamily: '"Inter", sans-serif' }}>
+              <div style={{ fontSize: '12px', color: '#A7ADAB', marginTop: '3px', fontFamily: '"Inter", sans-serif', lineHeight: 1.4 }}>
                 All search sectors covered and medical aid payload delivered within safety limits.
               </div>
             </div>
@@ -280,6 +294,7 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
               color: '#78D6A3',
               fontWeight: 600,
               letterSpacing: '0.08em',
+              flexShrink: 0,
             }}
           >
             OBJECTIVE MET
@@ -292,27 +307,29 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '8px',
-            padding: '16px 24px',
+            padding: isMobile ? '14px 16px' : '16px 24px',
             marginBottom: '20px',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
             justifyContent: 'space-between',
+            gap: isMobile ? '12px' : '16px',
             fontFamily: '"JetBrains Mono", monospace',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Sparkles size={18} color="#F0AE63" />
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <Sparkles size={18} color="#F0AE63" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
               <div style={{ fontSize: '10px', color: '#68706D', letterSpacing: '0.08em', marginBottom: '2px' }}>
                 WHAT CHANGED DURING THE MISSION?
               </div>
-              <div style={{ fontSize: '13px', color: '#F2F4F2', fontWeight: 600 }}>
+              <div style={{ fontSize: '13px', color: '#F2F4F2', fontWeight: 600, lineHeight: 1.4 }}>
                 1 communication failure · 1 blocked route · 2 tasks reassigned · 1 human decision
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
             <button
               onClick={scrollToReplay}
               style={{
@@ -338,8 +355,8 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '14px',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            gap: isMobile ? '10px' : '14px',
             marginBottom: '24px',
           }}
         >
@@ -470,7 +487,7 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '8px',
-            padding: '24px',
+            padding: isMobile ? '16px 14px' : '24px',
             marginBottom: '28px',
             fontFamily: '"JetBrains Mono", monospace',
           }}
@@ -479,11 +496,13 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
           <div
             style={{
               display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: isMobile ? 'flex-start' : 'center',
               paddingBottom: '16px',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               marginBottom: '16px',
+              gap: isMobile ? '12px' : '0',
             }}
           >
             <div>
@@ -496,7 +515,7 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
             </div>
 
             {/* Controls: [ ◀ Previous ] [ Play/Pause ] [ Next ▶ ] Speed: 1x · 2x · 4x */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div
                 style={{
                   fontSize: '10px',
@@ -644,8 +663,8 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '320px 1fr',
-              gap: '24px',
+              gridTemplateColumns: isMobile ? '1fr' : '320px 1fr',
+              gap: isMobile ? '16px' : '24px',
             }}
           >
             {/* Left: Vertical Timeline (8 Stages per Spec Section 34) */}
@@ -654,8 +673,10 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
-                borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-                paddingRight: '16px',
+                borderRight: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                borderBottom: isMobile ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+                paddingRight: isMobile ? '0' : '16px',
+                paddingBottom: isMobile ? '16px' : '0',
               }}
             >
               <div
@@ -911,7 +932,16 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
         </div>
 
         {/* 6. Bottom Navigation CTAs - Spec Section 33 */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+            gap: isMobile ? '12px' : '16px',
+            width: '100%',
+          }}
+        >
           <button
             onClick={() => {
               playUiTick();
@@ -921,12 +951,17 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
               background: 'transparent',
               border: '1px solid rgba(255, 255, 255, 0.24)',
               color: '#F2F4F2',
-              padding: '12px 24px',
+              padding: isMobile ? '12px 20px' : '12px 24px',
+              minHeight: '44px',
               borderRadius: '6px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             ← Back to Command Center
@@ -942,7 +977,8 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
                 background: '#F2F4F2',
                 border: 'none',
                 color: '#050607',
-                padding: '12px 28px',
+                padding: isMobile ? '14px 28px' : '12px 28px',
+                minHeight: '44px',
                 borderRadius: '6px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
@@ -950,8 +986,10 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 transition: 'all 0.15s ease',
+                width: isMobile ? '100%' : 'auto',
               }}
             >
               <span>View Strategy Comparison</span>
@@ -967,7 +1005,8 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
                 background: '#F2F4F2',
                 border: 'none',
                 color: '#050607',
-                padding: '12px 28px',
+                padding: isMobile ? '14px 28px' : '12px 28px',
+                minHeight: '44px',
                 borderRadius: '6px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '12px',
@@ -975,8 +1014,10 @@ export const MissionCompleteView: React.FC<MissionCompleteViewProps> = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 transition: 'all 0.15s ease',
+                width: isMobile ? '100%' : 'auto',
               }}
             >
               <RotateCcw size={14} />

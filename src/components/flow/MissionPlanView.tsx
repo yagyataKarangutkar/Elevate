@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlowNavbar } from './FlowNavbar';
 import {
   ArrowRight,
@@ -169,6 +169,18 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
   onNavigate,
   onContinueToCommandCenter,
 }) => {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+
   const displayObjective = missionConfig?.objective || objective;
   const agentCount = missionConfig?.selectedAgentIds.length || selectedAgents.length || 4;
 
@@ -194,14 +206,14 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
           maxWidth: '1160px',
           width: '100%',
           margin: '0 auto',
-          padding: '36px 24px 60px',
+          padding: isMobile ? '20px 16px 48px' : '36px 24px 60px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: isMobile ? '20px' : '28px',
         }}
       >
         {/* Header Block per Spec Section 15 & 16 */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div
               style={{
@@ -220,7 +232,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             </div>
             <h1
               style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 5.5vw, 32px)',
                 fontWeight: 400,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.2,
@@ -234,7 +246,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             <p
               style={{
                 color: '#A7ADAB',
-                fontSize: '14px',
+                fontSize: isMobile ? '13px' : '14px',
                 maxWidth: '640px',
               }}
             >
@@ -342,7 +354,7 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             </div>
           </div>
 
-          <div style={{ borderLeft: '1px solid rgba(255, 255, 255, 0.08)', paddingLeft: '16px' }}>
+          <div style={{ borderLeft: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.08)', paddingLeft: isMobile ? 0 : '16px' }}>
             <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', color: '#68706D', marginBottom: '4px' }}>
               PLAN FEASIBILITY
             </div>
@@ -535,40 +547,9 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             </span>
           </div>
 
-          <div
-            style={{
-              background: '#080A0B',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '6px',
-              overflowX: 'auto',
-            }}
-          >
-            <div style={{ minWidth: '700px' }}>
-            {/* Table Header */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '70px 2.2fr 1.4fr 2fr 110px 120px',
-                padding: '12px 18px',
-                background: 'rgba(255, 255, 255, 0.02)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '10px',
-                color: '#68706D',
-                letterSpacing: '0.06em',
-              }}
-            >
-              <div>TASK #</div>
-              <div>TASK NAME & SECTOR</div>
-              <div>ASSIGNED AGENT</div>
-              <div>REQUIRED CAPABILITY</div>
-              <div>STATUS</div>
-              <div style={{ textAlign: 'right' }}>PRIORITY</div>
-            </div>
-
-            {/* 9 Task Rows */}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {DEMO_TASKS.map((task, idx) => {
+          {isMobile ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {DEMO_TASKS.map((task) => {
                 const isReady = task.status === 'READY';
                 const isCritical = task.priority.includes('CRITICAL');
                 const isHigh = task.priority.includes('HIGH');
@@ -577,132 +558,294 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
                   <div
                     key={task.number}
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: '70px 2.2fr 1.4fr 2fr 110px 120px',
-                      padding: '14px 18px',
-                      alignItems: 'center',
-                      borderBottom: idx < DEMO_TASKS.length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
-                      background: isReady ? 'rgba(255, 255, 255, 0.015)' : 'transparent',
-                      transition: 'background 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = isReady ? 'rgba(255, 255, 255, 0.015)' : 'transparent';
+                      background: '#080A0B',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px',
+                      padding: '12px 14px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
                     }}
                   >
-                    {/* Task Number */}
-                    <div
-                      style={{
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        color: '#68706D',
-                      }}
-                    >
-                      {task.number}
-                    </div>
-
-                    {/* Task Name & Sector Badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          color: '#F2F4F2',
-                          fontFamily: '"Inter", sans-serif',
-                        }}
-                      >
-                        {task.name}
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '9px',
-                          color: task.zone === 'ZONE A' ? '#F25D5D' : task.zone === 'ZONE B' ? '#F0AE63' : '#78D6A3',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          padding: '1px 5px',
-                          borderRadius: '2px',
-                        }}
-                      >
-                        {task.zone}
-                      </span>
-                    </div>
-
-                    {/* Assigned Agent */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {task.agentType === 'Drone' ? (
-                        <Plane size={13} color="#A7ADAB" />
-                      ) : (
-                        <Bot size={13} color="#78D6A3" />
-                      )}
-                      <span
-                        style={{
-                          fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          color: '#F2F4F2',
-                        }}
-                      >
-                        {task.assignedAgent}
-                      </span>
-                    </div>
-
-                    {/* Required Capability */}
-                    <div style={{ paddingRight: '12px' }}>
-                      <span
-                        style={{
-                          fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '11px',
-                          color: '#A7ADAB',
-                          background: 'rgba(255, 255, 255, 0.03)',
-                          border: '1px solid rgba(255, 255, 255, 0.06)',
-                          borderRadius: '3px',
-                          padding: '3px 8px',
-                          display: 'inline-block',
-                        }}
-                      >
-                        {task.requiredCapability}
-                      </span>
-                    </div>
-
-                    {/* Status */}
-                    <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#68706D',
+                          }}
+                        >
+                          {task.number}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            color: task.zone === 'ZONE A' ? '#F25D5D' : task.zone === 'ZONE B' ? '#F0AE63' : '#78D6A3',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            padding: '1px 5px',
+                            borderRadius: '2px',
+                          }}
+                        >
+                          {task.zone}
+                        </span>
+                      </div>
                       <span
                         style={{
                           fontFamily: '"JetBrains Mono", monospace',
                           fontSize: '10px',
+                          color: isCritical ? '#F25D5D' : isHigh ? '#F0AE63' : '#A7ADAB',
                           fontWeight: 600,
-                          padding: '2px 8px',
-                          borderRadius: '3px',
-                          color: isReady ? '#78D6A3' : '#68706D',
-                          background: isReady ? 'rgba(120, 214, 163, 0.1)' : 'rgba(255, 255, 255, 0.04)',
-                          border: `1px solid ${isReady ? 'rgba(120, 214, 163, 0.25)' : 'rgba(255, 255, 255, 0.08)'}`,
                         }}
                       >
-                        {task.status}
+                        {task.priority}
                       </span>
                     </div>
 
-                    {/* Priority */}
                     <div
                       style={{
-                        textAlign: 'right',
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: '11px',
-                        color: isCritical ? '#F25D5D' : isHigh ? '#F0AE63' : '#A7ADAB',
-                        fontWeight: isCritical || isHigh ? 600 : 400,
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#F2F4F2',
+                        fontFamily: '"Inter", sans-serif',
                       }}
                     >
-                      {task.priority}
+                      {task.name}
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '6px',
+                        paddingTop: '4px',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {task.agentType === 'Drone' ? (
+                          <Plane size={12} color="#A7ADAB" />
+                        ) : (
+                          <Bot size={12} color="#78D6A3" />
+                        )}
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '11px',
+                            color: '#F2F4F2',
+                          }}
+                        >
+                          {task.assignedAgent}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '10px',
+                            color: '#A7ADAB',
+                            background: 'rgba(255, 255, 255, 0.04)',
+                            padding: '2px 6px',
+                            borderRadius: '3px',
+                          }}
+                        >
+                          {task.requiredCapability}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            padding: '2px 6px',
+                            borderRadius: '3px',
+                            color: isReady ? '#78D6A3' : '#68706D',
+                            background: isReady ? 'rgba(120, 214, 163, 0.1)' : 'rgba(255, 255, 255, 0.04)',
+                          }}
+                        >
+                          {task.status}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
+          ) : (
+            <div
+              style={{
+                background: '#080A0B',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '6px',
+                overflowX: 'auto',
+              }}
+              className="horizontal-scroll-container"
+            >
+              <div style={{ minWidth: '700px' }}>
+              {/* Table Header */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '70px 2.2fr 1.4fr 2fr 110px 120px',
+                  padding: '12px 18px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  fontSize: '10px',
+                  color: '#68706D',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                <div>TASK #</div>
+                <div>TASK NAME & SECTOR</div>
+                <div>ASSIGNED AGENT</div>
+                <div>REQUIRED CAPABILITY</div>
+                <div>STATUS</div>
+                <div style={{ textAlign: 'right' }}>PRIORITY</div>
+              </div>
+
+              {/* 9 Task Rows */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {DEMO_TASKS.map((task, idx) => {
+                  const isReady = task.status === 'READY';
+                  const isCritical = task.priority.includes('CRITICAL');
+                  const isHigh = task.priority.includes('HIGH');
+
+                  return (
+                    <div
+                      key={task.number}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '70px 2.2fr 1.4fr 2fr 110px 120px',
+                        padding: '14px 18px',
+                        alignItems: 'center',
+                        borderBottom: idx < DEMO_TASKS.length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+                        background: isReady ? 'rgba(255, 255, 255, 0.015)' : 'transparent',
+                        transition: 'background 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = isReady ? 'rgba(255, 255, 255, 0.015)' : 'transparent';
+                      }}
+                    >
+                      {/* Task Number */}
+                      <div
+                        style={{
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: '#68706D',
+                        }}
+                      >
+                        {task.number}
+                      </div>
+
+                      {/* Task Name & Sector Badge */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            color: '#F2F4F2',
+                            fontFamily: '"Inter", sans-serif',
+                          }}
+                        >
+                          {task.name}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '9px',
+                            color: task.zone === 'ZONE A' ? '#F25D5D' : task.zone === 'ZONE B' ? '#F0AE63' : '#78D6A3',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            padding: '1px 5px',
+                            borderRadius: '2px',
+                          }}
+                        >
+                          {task.zone}
+                        </span>
+                      </div>
+
+                      {/* Assigned Agent */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {task.agentType === 'Drone' ? (
+                          <Plane size={13} color="#A7ADAB" />
+                        ) : (
+                          <Bot size={13} color="#78D6A3" />
+                        )}
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: '#F2F4F2',
+                          }}
+                        >
+                          {task.assignedAgent}
+                        </span>
+                      </div>
+
+                      {/* Required Capability */}
+                      <div style={{ paddingRight: '12px' }}>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '11px',
+                            color: '#A7ADAB',
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid rgba(255, 255, 255, 0.06)',
+                            borderRadius: '3px',
+                            padding: '3px 8px',
+                            display: 'inline-block',
+                          }}
+                        >
+                          {task.requiredCapability}
+                        </span>
+                      </div>
+
+                      {/* Status */}
+                      <div>
+                        <span
+                          style={{
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: '3px',
+                            color: isReady ? '#78D6A3' : '#68706D',
+                            background: isReady ? 'rgba(120, 214, 163, 0.1)' : 'rgba(255, 255, 255, 0.04)',
+                            border: `1px solid ${isReady ? 'rgba(120, 214, 163, 0.25)' : 'rgba(255, 255, 255, 0.08)'}`,
+                          }}
+                        >
+                          {task.status}
+                        </span>
+                      </div>
+
+                      {/* Priority */}
+                      <div
+                        style={{
+                          textAlign: 'right',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontSize: '11px',
+                          color: isCritical ? '#F25D5D' : isHigh ? '#F0AE63' : '#A7ADAB',
+                          fontWeight: isCritical || isHigh ? 600 : 400,
+                        }}
+                      >
+                        {task.priority}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* 4. BOTTOM MISSION SUMMARY BAR */}
@@ -711,19 +854,21 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             background: '#080A0B',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: '6px',
-            padding: '16px 20px',
+            padding: isMobile ? '12px 14px' : '16px 20px',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            flexDirection: isMobile ? 'column' : 'row',
             flexWrap: 'wrap',
-            gap: '14px',
+            gap: '12px',
           }}
         >
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '20px',
+              flexWrap: 'wrap',
+              gap: isMobile ? '8px 12px' : '20px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '11px',
             }}
@@ -759,8 +904,10 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
             paddingTop: '24px',
             display: 'flex',
+            flexDirection: isMobile ? 'column-reverse' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'stretch',
+            gap: '12px',
           }}
         >
           <button
@@ -773,15 +920,18 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               background: 'transparent',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               color: '#A7ADAB',
-              padding: '10px 18px',
+              padding: isMobile ? '12px 18px' : '10px 18px',
+              minHeight: '44px',
               borderRadius: '4px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '6px',
               transition: 'all 0.2s',
+              width: isMobile ? '100%' : 'auto',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = '#F2F4F2';
@@ -808,7 +958,8 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               color: '#050607',
               border: 'none',
               borderRadius: '4px',
-              padding: '12px 28px',
+              padding: isMobile ? '14px 28px' : '12px 28px',
+              minHeight: '44px',
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '12px',
               fontWeight: 600,
@@ -816,9 +967,11 @@ export const MissionPlanView: React.FC<MissionPlanViewProps> = ({
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
               boxShadow: '0 2px 12px rgba(255, 255, 255, 0.15)',
               transition: 'all 0.2s',
+              width: isMobile ? '100%' : 'auto',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-1px)';

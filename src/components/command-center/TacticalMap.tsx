@@ -819,23 +819,27 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             top: '16px',
             left: '50%',
             transform: 'translateX(-50%)',
+            width: 'max-content',
+            maxWidth: 'calc(100% - 80px)',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '8px',
             background: 'rgba(240, 174, 99, 0.15)',
             border: '1px solid #F0AE63',
             color: '#F0AE63',
-            padding: '6px 14px',
+            padding: '6px 12px',
             borderRadius: '4px',
             fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '11px',
-            letterSpacing: '0.08em',
+            fontSize: 'clamp(9px, 2.5vw, 11px)',
+            letterSpacing: '0.06em',
             animation: 'pulse 1.5s infinite',
             zIndex: 10,
+            textAlign: 'center',
           }}
         >
-          <AlertTriangle size={14} />
-          <span>REPLANNING MISSION ROUTES — ADAPTING TO MESH SEPARATION</span>
+          <AlertTriangle size={13} style={{ flexShrink: 0 }} />
+          <span>REPLANNING MISSION ROUTES</span>
         </div>
       )}
 
@@ -843,8 +847,8 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       <div
         style={{
           position: 'absolute',
-          bottom: '16px',
-          right: '16px',
+          bottom: '12px',
+          right: '12px',
           display: 'flex',
           gap: '4px',
           zIndex: 10,
@@ -949,47 +953,48 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       <div
         style={{
           position: 'absolute',
-          bottom: '16px',
-          left: '16px',
+          bottom: '12px',
+          left: '12px',
           background: 'rgba(8, 10, 11, 0.85)',
           border: '1px solid rgba(255, 255, 255, 0.12)',
           borderRadius: '6px',
-          padding: '8px 12px',
+          padding: '6px 10px',
           fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '10px',
+          fontSize: '9.5px',
           color: '#A7ADAB',
           pointerEvents: 'none',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '5px',
+          maxWidth: '160px',
         }}
       >
-        <div style={{ color: '#68706D', fontWeight: 600, fontSize: '9px', letterSpacing: '0.06em' }}>
-          TERRAIN & ROUTING
+        <div style={{ color: '#68706D', fontWeight: 600, fontSize: '8.5px', letterSpacing: '0.06em' }}>
+          ROUTING
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: '18px', height: '2px', background: '#78D6A3' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '14px', height: '2px', background: '#78D6A3' }} />
           <span>Safe Route</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span
             style={{
-              width: '18px',
+              width: '14px',
               height: '2px',
-              background: 'repeating-linear-gradient(90deg, #F25D5D, #F25D5D 4px, transparent 4px, transparent 7px)',
+              background: 'repeating-linear-gradient(90deg, #F25D5D, #F25D5D 3px, transparent 3px, transparent 6px)',
             }}
           />
-          <span>Blocked Route</span>
+          <span>Blocked</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span
             style={{
-              width: '18px',
+              width: '14px',
               height: '2px',
               background: 'repeating-linear-gradient(90deg, #ffffff, #ffffff 3px, transparent 3px, transparent 6px)',
             }}
           />
-          <span>Communication Link</span>
+          <span>Mesh Link</span>
         </div>
       </div>
     </div>

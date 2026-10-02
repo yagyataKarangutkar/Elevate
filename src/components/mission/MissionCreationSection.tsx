@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import { playUiTick, playSuccessChirp, playReplanningTone } from '../../utils/audio';
 
@@ -14,6 +14,19 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
   );
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generationStep, setGenerationStep] = useState<number>(4); // 4 = ready
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const isStacked = windowWidth < 1024;
 
   const presets = [
     'Find survivors in the affected area',
@@ -80,7 +93,7 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
     <section
       id="mission-creation"
       style={{
-        padding: '80px 32px',
+        padding: isMobile ? '48px 16px' : isTablet ? '64px 28px' : '80px 32px',
         maxWidth: '1360px',
         margin: '0 auto',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -105,17 +118,18 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
 
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '48px',
+          display: isStacked ? 'flex' : 'grid',
+          flexDirection: isStacked ? 'column' : undefined,
+          gridTemplateColumns: isStacked ? undefined : '1fr 1fr',
+          gap: isMobile ? '28px' : '48px',
           alignItems: 'start',
         }}
       >
         {/* Left Column: Input and Objectives */}
-        <div>
+        <div style={{ width: '100%' }}>
           <h2
             style={{
-              fontSize: '32px',
+              fontSize: 'clamp(24px, 5vw, 32px)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               color: '#F2F4F2',
@@ -260,10 +274,12 @@ export const MissionCreationSection: React.FC<MissionCreationSectionProps> = ({
         {/* Right Column: Stepper and Mission Plan Ready Panel */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 1fr',
-            gap: '24px',
+            display: isMobile ? 'flex' : 'grid',
+            flexDirection: isMobile ? 'column' : undefined,
+            gridTemplateColumns: isMobile ? undefined : '1.2fr 1fr',
+            gap: isMobile ? '28px' : '24px',
             alignItems: 'start',
+            width: '100%',
           }}
         >
           {/* Stepper matching visual reference */}

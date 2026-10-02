@@ -1278,88 +1278,264 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               <span>{isMobile ? 'SIMULATE' : 'SIMULATE EVENT'}</span>
             </button>
 
-            {/* Simulation Options Dropdown */}
+            {/* Simulation Options Dropdown & Backdrop */}
             {showSimMenu && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '8px',
-                  width: '260px',
-                  background: '#080A0B',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '6px',
-                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.8)',
-                  padding: '8px',
-                  zIndex: 100,
-                  fontFamily: '"JetBrains Mono", monospace',
-                }}
-              >
-                <div style={{ fontSize: '10px', color: '#68706D', padding: '6px 8px' }}>
-                  SIMULATION CONTROLS
+              <>
+                <div
+                  onClick={() => setShowSimMenu(false)}
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 998,
+                    background: isMobile ? 'rgba(0, 0, 0, 0.65)' : 'transparent',
+                    backdropFilter: isMobile ? 'blur(3px)' : 'none',
+                    WebkitBackdropFilter: isMobile ? 'blur(3px)' : 'none',
+                  }}
+                />
+
+                <div
+                  style={{
+                    position: isMobile ? 'fixed' : 'absolute',
+                    top: isMobile ? '80px' : '100%',
+                    left: isMobile ? '12px' : 'auto',
+                    right: isMobile ? '12px' : 0,
+                    margin: isMobile ? '0 auto' : '8px 0 0 0',
+                    maxWidth: isMobile ? '400px' : '300px',
+                    width: isMobile ? 'calc(100vw - 24px)' : '300px',
+                    maxHeight: isMobile ? 'calc(100vh - 100px)' : 'auto',
+                    overflowY: isMobile ? 'auto' : 'visible',
+                    background: '#0B0F12',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    borderRadius: '8px',
+                    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+                    padding: '12px',
+                    zIndex: 999,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    animation: 'slideUp 0.15s ease-out',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingBottom: '8px',
+                      marginBottom: '8px',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Zap size={13} color="#F0AE63" />
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#F2F4F2', letterSpacing: '0.05em' }}>
+                        SIMULATION SCENARIOS
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setShowSimMenu(false)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#8E9693',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      <X size={15} />
+                    </button>
+                  </div>
+
+                  <div style={{ fontSize: '9px', color: '#68706D', letterSpacing: '0.06em', marginBottom: '8px', fontWeight: 600 }}>
+                    INJECT RUNTIME EVENTS
+                  </div>
+
+                  {/* Option 1: Communication Lost */}
+                  <button
+                    onClick={() => {
+                      triggerCommunicationLost();
+                      setShowSimMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 10px',
+                      background: 'rgba(242, 93, 93, 0.12)',
+                      border: '1px solid rgba(242, 93, 93, 0.35)',
+                      borderRadius: '5px',
+                      color: '#F25D5D',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '9px',
+                      minHeight: '44px',
+                    }}
+                  >
+                    <AlertTriangle size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700 }}>COMMUNICATION LOST (D3)</div>
+                      <div style={{ fontSize: '9.5px', color: '#E89292', marginTop: '2px', fontFamily: '"Inter", sans-serif' }}>
+                        Drone-03 drops to 12% signal. Swarm triggers relay replan.
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Option 2: Route Blocked */}
+                  <button
+                    onClick={() => {
+                      handleRouteBlocked();
+                      setShowSimMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 10px',
+                      background: 'rgba(240, 174, 99, 0.1)',
+                      border: '1px solid rgba(240, 174, 99, 0.3)',
+                      borderRadius: '5px',
+                      color: '#F0AE63',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '9px',
+                      minHeight: '44px',
+                    }}
+                  >
+                    <Slash size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700 }}>ROUTE BLOCKED (G1)</div>
+                      <div style={{ fontSize: '9.5px', color: '#D4B592', marginTop: '2px', fontFamily: '"Inter", sans-serif' }}>
+                        Ground rubble collapse; prompts alternate corridor.
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Option 3: Ground Robot Failure */}
+                  <button
+                    onClick={() => {
+                      handleGroundRobotFailure();
+                      setShowSimMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 10px',
+                      background: 'rgba(242, 93, 93, 0.08)',
+                      border: '1px solid rgba(242, 93, 93, 0.25)',
+                      borderRadius: '5px',
+                      color: '#FF8585',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '9px',
+                      minHeight: '44px',
+                    }}
+                  >
+                    <AlertTriangle size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700 }}>DRIVE FAILURE (G1)</div>
+                      <div style={{ fontSize: '9.5px', color: '#D69E9E', marginTop: '2px', fontFamily: '"Inter", sans-serif' }}>
+                        Drive motor stalls; triggers Lifeline reserve dispatch.
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Option 4: Survivor Detected */}
+                  <button
+                    onClick={() => {
+                      handleSurvivorDetected();
+                      setShowSimMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 10px',
+                      background: 'rgba(56, 229, 77, 0.08)',
+                      border: '1px solid rgba(56, 229, 77, 0.25)',
+                      borderRadius: '5px',
+                      color: '#5CE877',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      marginBottom: '8px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '9px',
+                      minHeight: '44px',
+                    }}
+                  >
+                    <Target size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700 }}>SURVIVOR DETECTED</div>
+                      <div style={{ fontSize: '9.5px', color: '#97D8A7', marginTop: '2px', fontFamily: '"Inter", sans-serif' }}>
+                        Thermal hit at [290, 150]; elevates priority sweep.
+                      </div>
+                    </div>
+                  </button>
+
+                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {/* View AI Reasoning */}
+                    <button
+                      onClick={() => {
+                        setShowSimMenu(false);
+                        setShowReasoningModal(true);
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px 10px',
+                        background: 'rgba(92, 225, 230, 0.08)',
+                        border: '1px solid rgba(92, 225, 230, 0.25)',
+                        borderRadius: '4px',
+                        color: '#5CE1E6',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        minHeight: '40px',
+                      }}
+                    >
+                      <Sparkles size={14} />
+                      <span>View AI Reasoning ("Why GroundBot?")</span>
+                    </button>
+
+                    {/* Reset Simulation */}
+                    <button
+                      onClick={() => {
+                        handleResetSimulation();
+                        handleResetScenario();
+                        setShowSimMenu(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '8px 10px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '4px',
+                        color: '#A7ADAB',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        minHeight: '40px',
+                      }}
+                    >
+                      <RefreshCw size={13} />
+                      <span>Reset Simulation</span>
+                    </button>
+                  </div>
                 </div>
-
-                <button
-                  onClick={triggerCommunicationLost}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '8px 10px',
-                    background: 'rgba(242, 93, 93, 0.1)',
-                    border: '1px solid rgba(242, 93, 93, 0.3)',
-                    borderRadius: '4px',
-                    color: '#F25D5D',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    marginBottom: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <AlertTriangle size={13} />
-                  <span>COMMUNICATION LOST (D3)</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowSimMenu(false);
-                    setShowReasoningModal(true);
-                  }}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '8px 10px',
-                    background: 'transparent',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '4px',
-                    color: '#A7ADAB',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    marginBottom: '6px',
-                  }}
-                >
-                  View AI Reasoning ("Why GroundBot?")
-                </button>
-
-                <button
-                  onClick={handleResetSimulation}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '8px 10px',
-                    background: 'transparent',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '4px',
-                    color: '#A7ADAB',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Reset Simulation
-                </button>
-              </div>
+              </>
             )}
           </div>
 
